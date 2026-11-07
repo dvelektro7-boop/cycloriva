@@ -1,0 +1,105 @@
+{
+  "date": "2026-11-06T14:08:59.357Z",
+  "totalProducts": 401,
+  "initialWithImages": 27,
+  "initialWithoutImages": 374,
+  "processed": 0,
+  "recoveredProducts": 0,
+  "imagesDownloaded": 0,
+  "rejected": 10,
+  "errors": 0,
+  "results": [
+    {
+      "productId": "851",
+      "productName": "E-Bike City ARROW noir",
+      "selectedPage": null,
+      "score": null,
+      "images": [],
+      "status": "rejected",
+      "errors": []
+    },
+    {
+      "productId": "860",
+      "productName": "E-Bike City RILEY mint",
+      "selectedPage": null,
+      "score": null,
+      "images": [],
+      "status": "rejected",
+      "errors": []
+    },
+    {
+      "productId": "869",
+      "productName": "Vélo tout terrain électrique fully 27.5\" PANTHER-S",
+      "selectedPage": null,
+      "score": null,
+      "images": [],
+      "status": "rejected",
+      "errors": []
+    },
+    {
+      "productId": "880",
+      "productName": "E-Bike City BETTY bleu",
+      "selectedPage": null,
+      "score": null,
+      "images": [],
+      "status": "rejected",
+      "errors": []
+    },
+    {
+      "productId": "886",
+      "productName": "",
+      "selectedPage": null,
+      "score": null,
+      "images": [],
+      "status": "rejected",
+      "errors": []
+    },
+    {
+      "productId": "894",
+      "productName": "E-Bike City RILEY noir",
+      "selectedPage": null,
+      "score": null,
+      "images": [],
+      "status": "rejected",
+      "errors": []
+    },
+    {
+      "productId": "902",
+      "productName": "Vélo tout terrain électrique ONYX 27.5\"",
+      "selectedPage": null,
+      "score": null,
+      "images": [],
+      "status": "rejected",
+      "errors": []
+    },
+    {
+      "productId": "909",
+      "productName": "Vélo tout terrain électrique 27.5\" VIRTUE-S",
+      "selectedPage": null,
+      "score": null,
+      "images": [],
+      "status": "rejected",
+      "errors": []
+    },
+    {
+      "productId": "916",
+      "productName": "E-Bike City LINDSEY rose",
+      "selectedPage": null,
+      "score": null,
+      "images": [],
+      "status": "rejected",
+      "errors": []
+    },
+    {
+      "productId": "924",
+      "productName": "E-Bike Mountainbike 24\" orange/bleu",
+      "selectedPage": null,
+      "score": null,
+      "images": [],
+      "status": "rejected",
+      "errors": []
+    }
+  ],
+  "finalWithImages": 27,
+  "finalWithoutImages": 374
+}

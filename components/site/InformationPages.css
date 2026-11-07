@@ -1,0 +1,33 @@
+﻿/* Scoped to information pages; catalogue and checkout keep their own layouts. */
+.info-page {
+  width: 100%;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.info-page > div {
+  min-width: 0;
+}
+.info-page section,
+.info-page article {
+  min-width: 0;
+  scroll-margin-top: 20px;
+}
+.info-page nav {
+  flex-wrap: wrap;
+}
+.info-page details summary {
+  touch-action: manipulation;
+}
+@media (max-width: 639px) {
+  .info-page > div {
+    padding-inline: 14px;
+  }
+  .info-page h1,
+  .info-page h2,
+  .info-page h3 {
+    overflow-wrap: anywhere;
+  }
+  .info-page a {
+    overflow-wrap: anywhere;
+  }
+}

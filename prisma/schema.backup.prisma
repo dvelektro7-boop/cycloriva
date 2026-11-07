@@ -1,0 +1,403 @@
+
+/// ==========================================================
+/// CYCLORIVA — SCHÉMA DE BASE DE DONNÉES
+/// ==========================================================
+///
+/// Prisma ORM 7
+/// PostgreSQL / Supabase
+///
+/// Gestion :
+/// - Commandes clients
+/// - Coordonnées de livraison
+/// - Produits commandés
+/// - Quantités et prix
+/// - Montants calculés côté serveur
+/// - Statuts de commande
+/// - E-mails automatiques
+///
+/// IMPORTANT :
+/// - Les produits proviennent actuellement de
+///   data/products.json.
+/// - Les lignes de commande conservent une copie
+///   des informations commerciales au moment
+///   de la validation.
+/// - Aucun paiement n'est considéré comme réussi
+///   lors de la simple création d'une commande.
+/// ==========================================================
+
+
+// ===========================================================
+// 1. PRISMA CLIENT
+// ===========================================================
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+
+// ===========================================================
+// 2. BASE DE DONNÉES
+// ===========================================================
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+// ===========================================================
+// 3. PAYS DE LIVRAISON
+// ===========================================================
+
+enum CheckoutCountry {
+  DE
+  FR
+  ES
+  IT
+  CH
+  AT
+  NL
+  BE
+}
+
+
+// ===========================================================
+// 4. STATUTS DES COMMANDES
+// ===========================================================
+
+enum CheckoutOrderStatus {
+  RECEIVED
+  PENDING_PAYMENT
+  CONFIRMED
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+
+// ===========================================================
+// 5. STATUTS DE PAIEMENT
+// ===========================================================
+
+enum CheckoutPaymentStatus {
+  NOT_REQUESTED
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+
+// ===========================================================
+// 6. TYPES D'E-MAILS
+// ===========================================================
+
+enum CheckoutEmailType {
+  CUSTOMER_CONFIRMATION
+  ADMIN_NOTIFICATION
+}
+
+
+// ===========================================================
+// 7. STATUTS D'ENVOI DES E-MAILS
+// ===========================================================
+
+enum CheckoutEmailStatus {
+  PENDING
+  PROCESSING
+  SENT
+  FAILED
+}
+
+
+// ===========================================================
+// 8. COMMANDE PRINCIPALE
+// ===========================================================
+
+model CheckoutOrder {
+
+  // ---------------------------------------------------------
+  // IDENTIFICATION
+  // ---------------------------------------------------------
+
+  id String @id @default(cuid())
+
+  /// Numéro commercial unique généré côté serveur.
+  /// Exemple de format possible : CY-2026-XXXXXXXX
+  orderNumber String @unique @db.VarChar(64)
+
+  /// Identifiant permettant d'éviter les commandes
+  /// créées en double après plusieurs clics.
+  idempotencyKey String @unique @db.VarChar(128)
+
+  // ---------------------------------------------------------
+  // CLIENT
+  // ---------------------------------------------------------
+
+  firstName String @db.VarChar(100)
+
+  lastName String @db.VarChar(100)
+
+  email String @db.VarChar(254)
+
+  /// Indicatif sélectionné par le client.
+  /// Exemple : +49, +33, +41.
+  phoneDialCode String @db.VarChar(8)
+
+  /// Numéro fourni par le client.
+  phoneNational String @db.VarChar(40)
+
+  /// Numéro international normalisé.
+  /// Enregistré après validation.
+  phoneE164 String @db.VarChar(20)
+
+  // ---------------------------------------------------------
+  // LIVRAISON
+  // ---------------------------------------------------------
+
+  country CheckoutCountry
+
+  city String @db.VarChar(150)
+
+  postalCode String @db.VarChar(32)
+
+  addressLine1 String @db.VarChar(255)
+
+  addressLine2 String? @db.VarChar(255)
+
+  // ---------------------------------------------------------
+  // LOCALISATION ET LANGUE
+  // ---------------------------------------------------------
+
+  /// Langue du site lors de la commande :
+  /// fr, en, de, it, es.
+  locale String @default("fr") @db.VarChar(5)
+
+  /// Pays approximatif détecté par géolocalisation IP.
+  /// Facultatif ; jamais utilisé comme adresse confirmée.
+  detectedCountry CheckoutCountry?
+
+  // ---------------------------------------------------------
+  // MONTANTS
+  // ---------------------------------------------------------
+
+  /// Tous les montants sont enregistrés
+  /// en centimes d'euro.
+  ///
+  /// Exemple :
+  /// 721,65 EUR = 72165 centimes.
+  ///
+  /// Les sommes sont recalculées côté serveur.
+
+  currency String @default("EUR") @db.VarChar(3)
+
+  /// Total des produits avant livraison.
+  subtotalCents Int
+
+  /// Frais de livraison calculés.
+  shippingCents Int
+
+  /// Montant de taxe détaillé, si applicable.
+  /// Null si non encore ventilé ou non applicable.
+  taxCents Int?
+
+  /// Total final accepté par le client.
+  totalCents Int
+
+  // ---------------------------------------------------------
+  // STATUTS
+  // ---------------------------------------------------------
+
+  status CheckoutOrderStatus @default(RECEIVED)
+
+  paymentStatus CheckoutPaymentStatus @default(NOT_REQUESTED)
+
+  // ---------------------------------------------------------
+  // INFORMATIONS COMPLÉMENTAIRES
+  // ---------------------------------------------------------
+
+  /// Date de validation commerciale.
+  confirmedAt DateTime?
+
+  /// Date d'expédition.
+  shippedAt DateTime?
+
+  /// Date de livraison.
+  deliveredAt DateTime?
+
+  /// Date d'annulation.
+  cancelledAt DateTime?
+
+  /// Référence éventuelle d'un service de paiement.
+  paymentReference String? @db.VarChar(191)
+
+  // ---------------------------------------------------------
+  // RELATIONS
+  // ---------------------------------------------------------
+
+  items CheckoutOrderItem[]
+
+  emailNotifications CheckoutEmailNotification[]
+
+  // ---------------------------------------------------------
+  // HORODATAGE
+  // ---------------------------------------------------------
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  // ---------------------------------------------------------
+  // INDEX
+  // ---------------------------------------------------------
+
+  @@index([email])
+  @@index([country])
+  @@index([status, createdAt])
+  @@index([paymentStatus, createdAt])
+  @@index([createdAt])
+}
+
+
+// ===========================================================
+// 9. PRODUITS D'UNE COMMANDE
+// ===========================================================
+
+model CheckoutOrderItem {
+
+  id String @id @default(cuid())
+
+  // ---------------------------------------------------------
+  // COMMANDE PARENTE
+  // ---------------------------------------------------------
+
+  orderId String
+
+  order CheckoutOrder @relation(
+    fields: [orderId],
+    references: [id],
+    onDelete: Cascade
+  )
+
+  // ---------------------------------------------------------
+  // PRODUIT ORIGINAL
+  // ---------------------------------------------------------
+
+  /// Identifiant venant de data/products.json.
+  ///
+  /// Ce champ reste une chaîne car le catalogue
+  /// ne dépend pas encore d'une table Prisma Product.
+  productId String @db.VarChar(191)
+
+  sku String? @db.VarChar(191)
+
+  /// Nom conservé au moment de la commande.
+  productName String @db.VarChar(500)
+
+  /// Image principale conservée pour le récapitulatif.
+  productImage String? @db.Text
+
+  // ---------------------------------------------------------
+  // QUANTITÉ ET MONTANTS
+  // ---------------------------------------------------------
+
+  quantity Int
+
+  /// Prix unitaire au moment de la validation.
+  unitPriceCents Int
+
+  /// quantity * unitPriceCents.
+  lineTotalCents Int
+
+  currency String @default("EUR") @db.VarChar(3)
+
+  // ---------------------------------------------------------
+  // HORODATAGE
+  // ---------------------------------------------------------
+
+  createdAt DateTime @default(now())
+
+  // ---------------------------------------------------------
+  // INDEX
+  // ---------------------------------------------------------
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+
+// ===========================================================
+// 10. NOTIFICATIONS E-MAIL
+// ===========================================================
+
+model CheckoutEmailNotification {
+
+  id String @id @default(cuid())
+
+  // ---------------------------------------------------------
+  // COMMANDE ASSOCIÉE
+  // ---------------------------------------------------------
+
+  orderId String
+
+  order CheckoutOrder @relation(
+    fields: [orderId],
+    references: [id],
+    onDelete: Cascade
+  )
+
+  // ---------------------------------------------------------
+  // TYPE DE NOTIFICATION
+  // ---------------------------------------------------------
+
+  type CheckoutEmailType
+
+  /// Adresse de destination validée côté serveur.
+  recipientEmail String @db.VarChar(254)
+
+  /// Langue du message.
+  locale String @default("fr") @db.VarChar(5)
+
+  // ---------------------------------------------------------
+  // SUIVI DE L'ENVOI
+  // ---------------------------------------------------------
+
+  status CheckoutEmailStatus @default(PENDING)
+
+  /// Nombre de tentatives effectuées.
+  attempts Int @default(0)
+
+  /// Date de la prochaine tentative.
+  nextAttemptAt DateTime?
+
+  /// Dernière erreur de l'envoi.
+  lastError String? @db.Text
+
+  /// Identifiant de message fourni par le prestataire.
+  providerMessageId String? @db.VarChar(191)
+
+  /// Date d'envoi réussi.
+  sentAt DateTime?
+
+  // ---------------------------------------------------------
+  // HORODATAGE
+  // ---------------------------------------------------------
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  // ---------------------------------------------------------
+  // CONTRAINTES ET INDEX
+  // ---------------------------------------------------------
+
+  /// Une notification client et une notification
+  /// administrateur maximum par commande.
+  @@unique([orderId, type])
+
+  @@index([status, nextAttemptAt])
+  @@index([createdAt])
+}

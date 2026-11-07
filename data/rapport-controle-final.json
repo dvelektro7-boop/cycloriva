@@ -1,0 +1,47 @@
+{
+  "generatedAt": "2026-11-07T09:26:39.865Z",
+  "expectedProductCount": 401,
+  "productCount": 401,
+  "productCountCorrect": true,
+  "uniqueIds": 401,
+  "totalImagesLinked": 4848,
+  "totalPhysicalImages": 4848,
+  "productsWithoutImage": [],
+  "productsWithOneImage": [
+    {
+      "id": "1567",
+      "name": "Cilo Cityliner CCL°02+ Transparent Blue",
+      "image": "/images/produits/1567/01.webp"
+    },
+    {
+      "id": "1633",
+      "name": "Allegro Invisible City ACIL°03 Sandstone",
+      "image": "/images/produits/1633/01.webp"
+    },
+    {
+      "id": "1640",
+      "name": "Allegro Invisible City ACIL°03 Honey 26\"",
+      "image": "/images/produits/1640/01.webp"
+    },
+    {
+      "id": "1900",
+      "name": "Cilo Rock CXK24°07 Candy",
+      "image": "/images/produits/1900/01.webp"
+    },
+    {
+      "id": "1995",
+      "name": "Cilo Rock CXK24°07 safran",
+      "image": "/images/produits/1995/01.webp"
+    }
+  ],
+  "productsWithoutId": [],
+  "productsWithoutName": [],
+  "duplicateIds": [],
+  "duplicateImagesInsideProduct": [],
+  "invalidImagePaths": [],
+  "missingImageFiles": [],
+  "wrongProductFolder": [],
+  "unsupportedFiles": [],
+  "unreferencedFiles": [],
+  "ok": true
+}

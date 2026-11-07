@@ -1,26 +1,537 @@
+
+/* =========================================================
+   CYCLORIVA — STYLES GLOBAUX
+   Next.js 16 • Tailwind CSS 4 • shadcn/ui
+   Responsive PC / Tablette / Mobile
+   ========================================================= */
+
+/* =========================================================
+   1. IMPORTATIONS
+   ========================================================= */
+
 @import "tailwindcss";
 
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* =========================================================
+   2. VARIABLES DE MARQUE CYCLORIVA
+   ========================================================= */
+
 :root {
+  /* Identité officielle */
+
+  --cycloriva-navy: #102b39;
+  --cycloriva-navy-dark: #0b202c;
+  --cycloriva-navy-light: #183c4d;
+
+  --cycloriva-green: #24b715;
+  --cycloriva-green-hover: #168e0a;
+  --cycloriva-green-light: #8ce900;
+
+  --cycloriva-white: #ffffff;
+  --cycloriva-background: #f8fafc;
+
+  /* Typographie */
+
+  --cycloriva-font:
+    Arial, Helvetica, sans-serif;
+
+  /* Largeur maximale du site */
+
+  --cycloriva-container: 1440px;
+
+  /* Bordures et arrondis */
+
+  --radius: 0.625rem;
+
+  /* =====================================================
+     THÈME SHADCN — MODE CLAIR
+     ===================================================== */
+
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #102b39;
+
+  --card: #ffffff;
+  --card-foreground: #102b39;
+
+  --popover: #ffffff;
+  --popover-foreground: #102b39;
+
+  --primary: #24b715;
+  --primary-foreground: #ffffff;
+
+  --secondary: #f1f5f9;
+  --secondary-foreground: #102b39;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+
+  --accent: #eaf8e7;
+  --accent-foreground: #166e0d;
+
+  --destructive: #dc2626;
+
+  --border: #e2e8f0;
+  --input: #cbd5e1;
+  --ring: #24b715;
+
+  /* Graphiques */
+
+  --chart-1: #24b715;
+  --chart-2: #102b39;
+  --chart-3: #8ce900;
+  --chart-4: #34895b;
+  --chart-5: #64748b;
+
+  /* Sidebar */
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #102b39;
+
+  --sidebar-primary: #24b715;
+  --sidebar-primary-foreground: #ffffff;
+
+  --sidebar-accent: #eaf8e7;
+  --sidebar-accent-foreground: #102b39;
+
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #24b715;
 }
+
+/* =========================================================
+   3. THÈME TAILWIND CSS 4
+   ========================================================= */
+
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Couleurs générales */
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Couleurs CYCLORIVA */
+
+  --color-cycloriva-navy: var(--cycloriva-navy);
+  --color-cycloriva-green: var(--cycloriva-green);
+  --color-cycloriva-green-light: var(--cycloriva-green-light);
+
+  /* Graphiques */
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Sidebar */
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground:
+    var(--sidebar-primary-foreground);
+
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground:
+    var(--sidebar-accent-foreground);
+
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Typographie */
+
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: Consolas, "Courier New", monospace;
+  --font-heading: Arial, Helvetica, sans-serif;
+
+  /* Arrondis */
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* =========================================================
+   4. MODE SOMBRE SHADCN
+   ========================================================= */
+
+.dark {
+  --background: #0b202c;
+  --foreground: #f8fafc;
+
+  --card: #102b39;
+  --card-foreground: #f8fafc;
+
+  --popover: #102b39;
+  --popover-foreground: #f8fafc;
+
+  --primary: #44ce32;
+  --primary-foreground: #081b13;
+
+  --secondary: #183c4d;
+  --secondary-foreground: #f8fafc;
+
+  --muted: #183c4d;
+  --muted-foreground: #cbd5e1;
+
+  --accent: #183c4d;
+  --accent-foreground: #ffffff;
+
+  --destructive: #ef4444;
+
+  --border: #345261;
+  --input: #345261;
+  --ring: #44ce32;
+
+  --chart-1: #44ce32;
+  --chart-2: #8ce900;
+  --chart-3: #79a8b8;
+  --chart-4: #cbd5e1;
+  --chart-5: #64748b;
+
+  --sidebar: #102b39;
+  --sidebar-foreground: #f8fafc;
+
+  --sidebar-primary: #44ce32;
+  --sidebar-primary-foreground: #081b13;
+
+  --sidebar-accent: #183c4d;
+  --sidebar-accent-foreground: #f8fafc;
+
+  --sidebar-border: #345261;
+  --sidebar-ring: #44ce32;
+}
+
+/* =========================================================
+   5. STYLES DE BASE
+   ========================================================= */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: var(--cycloriva-font);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+
+    min-width: 320px;
+    min-height: 100vh;
+
+    margin: 0;
+
+    font-family: var(--cycloriva-font);
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--cycloriva-font);
+    text-wrap: pretty;
+  }
+
+  img,
+  picture,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+
+  img {
+    height: auto;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  a {
+    text-decoration: none;
+  }
+
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--cycloriva-green);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: #c6f5ba;
+    color: #102b39;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* =========================================================
+   6. STRUCTURE RESPONSIVE CYCLORIVA
+   ========================================================= */
+
+@layer components {
+  .cycloriva-container {
+    width: 100%;
+    max-width: none;
+
+    margin-inline: auto;
+
+    padding-inline: 1rem;
+  }
+
+  .cycloriva-section {
+    padding-block: 3rem;
+  }
+
+  .cycloriva-section-title {
+    color: var(--cycloriva-navy);
+
+    font-size: clamp(1.5rem, 2.4vw, 2.25rem);
+    font-weight: 800;
+    line-height: 1.2;
+
+    letter-spacing: -0.025em;
+  }
+
+  .cycloriva-section-description {
+    margin-top: 0.75rem;
+
+    color: #64748b;
+
+    font-size: 0.95rem;
+    line-height: 1.7;
+  }
+
+  /* Bouton principal */
+
+  .cycloriva-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    min-height: 44px;
+    padding: 0.75rem 1.5rem;
+
+    border: 1px solid transparent;
+    border-radius: 0.625rem;
+
+    background: var(--cycloriva-green);
+    color: #ffffff;
+
+    font-size: 0.875rem;
+    font-weight: 700;
+
+    transition:
+      background-color 180ms ease,
+      transform 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .cycloriva-button:hover {
+    background: var(--cycloriva-green-hover);
+  }
+
+  .cycloriva-button:active {
+    transform: translateY(1px);
+  }
+
+  /* Bouton secondaire */
+
+  .cycloriva-button-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    min-height: 44px;
+    padding: 0.75rem 1.5rem;
+
+    border: 1px solid var(--cycloriva-navy);
+    border-radius: 0.625rem;
+
+    background: transparent;
+    color: var(--cycloriva-navy);
+
+    font-size: 0.875rem;
+    font-weight: 700;
+
+    transition:
+      background-color 180ms ease,
+      color 180ms ease;
+  }
+
+  .cycloriva-button-outline:hover {
+    background: var(--cycloriva-navy);
+    color: #ffffff;
+  }
+
+  /* Cartes produits */
+
+  .cycloriva-product-card {
+    overflow: hidden;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 0.875rem;
+
+    background: #ffffff;
+
+    transition:
+      border-color 200ms ease,
+      transform 200ms ease,
+      box-shadow 200ms ease;
+  }
+
+  .cycloriva-product-card:hover {
+    transform: translateY(-3px);
+
+    border-color: #cbd5e1;
+
+    box-shadow:
+      0 10px 30px rgb(16 43 57 / 9%);
+  }
+
+  /* Conteneur des images produits */
+
+  .cycloriva-product-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    aspect-ratio: 4 / 3;
+
+    overflow: hidden;
+
+    background: #ffffff;
+  }
+
+  .cycloriva-product-image img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+  }
 }
+
+/* =========================================================
+   7. TABLETTE ET PC
+   ========================================================= */
+
+@media (min-width: 640px) {
+  .cycloriva-container {
+    padding-inline: 1.5rem;
+  }
+
+  .cycloriva-section {
+    padding-block: 4rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cycloriva-container {
+    padding-inline: 2.5rem;
+  }
+
+  .cycloriva-section {
+    padding-block: 5rem;
+  }
+}
+
+/* =========================================================
+   8. OPTIMISATIONS MOBILE
+   ========================================================= */
+
+@media (max-width: 639px) {
+  .cycloriva-section-title {
+    font-size: 1.55rem;
+  }
+
+  .cycloriva-section-description {
+    font-size: 0.875rem;
+  }
+
+  .cycloriva-product-card:hover {
+    transform: none;
+  }
+}
+
+/* =========================================================
+   9. ACCESSIBILITÉ ET ANIMATIONS
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Current selling prices; previous prices remain neutral. */
+.cycloriva-price { color: #b91c1c; }

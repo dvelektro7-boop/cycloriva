@@ -1,0 +1,150 @@
+/* Compact spacing is restricted to the home page and its shared chrome. */
+#cycloriva-home .cycloriva-container {
+  width: 100%;
+  max-width: none;
+  padding-inline: clamp(0.625rem, 2.5vw, 2.5rem);
+}
+
+#cycloriva-home > section:not([id="home-hero"]) {
+  padding-block: 0.5rem;
+}
+
+#cycloriva-home h2 {
+  font-size: clamp(1rem, 1.3vw, 1.125rem);
+  line-height: 1.25;
+}
+
+#cycloriva-home :is(
+  #categories,
+  #home-featured-products,
+  #home-new-products,
+  #why-choose-cycloriva,
+  #home-reviews
+) > div > div:first-child {
+  margin-bottom: 0.5rem;
+}
+
+#cycloriva-home #categories > div > div:last-child {
+  gap: 0.5rem;
+}
+
+#cycloriva-home #categories > div > div:last-child > a {
+  min-height: 5.5rem;
+  padding: 0.5rem;
+}
+
+#cycloriva-home #categories > div > div:last-child > a > div:first-child {
+  height: 3.5rem;
+}
+
+#cycloriva-home :is(#home-featured-products, #home-new-products) article > div:first-child {
+  padding: 0.375rem 0.5rem 0;
+}
+
+#cycloriva-home :is(#home-featured-products, #home-new-products) article > div:first-child > a {
+  height: clamp(6rem, 9vw, 8rem);
+}
+
+#cycloriva-home #home-new-products article > div:first-child > a {
+  height: clamp(4.5rem, 6vw, 6rem);
+}
+
+#cycloriva-home > section[aria-label] > div > div {
+  padding-block: 0.5rem;
+}
+
+#cycloriva-home :is(#home-featured-products, #home-new-products) article > div:nth-child(2) {
+  padding: 0.375rem 0.5rem 0.5rem;
+}
+
+#cycloriva-home :is(#home-featured-products, #home-new-products) article h3 {
+  min-height: 0;
+  line-height: 1.3;
+}
+
+#cycloriva-home :is(#home-featured-products, #home-new-products) article > div:nth-child(2) > div {
+  padding-top: 0.375rem;
+}
+
+#cycloriva-home #why-choose-cycloriva > div > div:last-child {
+  gap: 0.75rem;
+}
+
+#cycloriva-home #why-choose-cycloriva img {
+  height: 5.5rem;
+}
+
+#cycloriva-home > .cycloriva-home-bottom {
+  padding-block: 0.5rem 0.75rem;
+}
+
+#cycloriva-home > .cycloriva-home-bottom > div {
+  gap: 0.75rem;
+}
+
+#cycloriva-home > .cycloriva-home-bottom section {
+  padding-block: 0;
+}
+
+#cycloriva-home > .cycloriva-home-bottom .cycloriva-container {
+  padding-inline: 0;
+}
+
+#cycloriva-home #home-reviews > div > div:nth-child(2) {
+  min-height: 6.5rem;
+  padding-block: 0.625rem;
+}
+
+#cycloriva-home #home-newsletter > div {
+  padding: 0.75rem;
+}
+
+#cycloriva-home #home-newsletter > div > div {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+#cycloriva-home #home-newsletter form {
+  width: 100%;
+  max-width: none;
+}
+
+/* Keep these changes out of the catalogue and product pages. */
+[data-site="cycloriva"]:has(#cycloriva-home) > header > div:first-child {
+  height: 4rem;
+}
+
+[data-site="cycloriva"]:has(#cycloriva-home) > header > nav {
+  height: 2.5rem;
+}
+
+[data-site="cycloriva"]:has(#cycloriva-home) > footer > div {
+  padding-block: 1rem 0.625rem;
+}
+
+[data-site="cycloriva"]:has(#cycloriva-home) > footer > div > div:first-child {
+  column-gap: 1rem;
+  row-gap: 1rem;
+}
+
+[data-site="cycloriva"]:has(#cycloriva-home) > footer > div > div:last-child {
+  margin-top: 0.75rem;
+  padding-top: 0.625rem;
+}
+
+@media (width < 64rem) {
+  [data-site="cycloriva"]:has(#cycloriva-home) > header > div:nth-of-type(2) {
+    height: 3.5rem;
+  }
+
+  [data-site="cycloriva"]:has(#cycloriva-home) > header > div:nth-of-type(3) {
+    height: 2rem;
+  }
+}
+
+@media (width >= 64rem) {
+  #cycloriva-home #categories > div > div:last-child > a {
+    min-height: 4.5rem;
+  }
+}

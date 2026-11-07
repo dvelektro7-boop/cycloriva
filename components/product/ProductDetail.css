@@ -1,0 +1,20 @@
+#cycloriva-product-detail .cycloriva-container { max-width: none; padding-inline: clamp(12px, 3vw, 48px); }
+#cycloriva-product-detail [data-component="product-summary"] { overflow-wrap: anywhere; }
+#cycloriva-product-detail [data-component="product-gallery"] { min-width: 0; }
+#cycloriva-product-detail [data-component="product-summary"] p { max-width: 70ch; }
+#cycloriva-product-detail [data-component="related-product-card"] { min-width: 0; }
+#cycloriva-product-detail [data-component="product-related-products"] h2 { padding-right: 80px; }
+.product-quantity { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12px; font-weight: 600; }
+.product-quantity input { width: 72px; padding: 7px; border: 1px solid #cbd5e1; border-radius: 7px; }
+.product-order-buttons { display: grid; gap: 10px; }
+.product-order-button { display:flex; align-items:center; justify-content:center; gap:10px; min-height:56px; border-radius:8px; padding:10px; color:white; background:#08283b; text-align:center; font-size:13px; font-weight:700; cursor:pointer; }
+.product-order-button small { display:block; font-size:10px; font-weight:400; margin-top:2px; }
+.product-order-button:first-child { background:#078b17; }
+.product-order-button:disabled { opacity:.5; cursor:not-allowed; }
+.product-order-button:focus-visible { outline:3px solid #83d900; outline-offset:3px; }
+@media (min-width:1024px) { .product-order-buttons { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:1023px) {
+  #cycloriva-product-detail { padding-bottom: calc(72px + env(safe-area-inset-bottom)); }
+  #cycloriva-product-detail [data-component="product-summary"] h1 { font-size:20px; }
+  #cycloriva-product-detail [data-component="product-service-strip"] { padding-inline:0; }
+}

@@ -1,0 +1,6 @@
+#cycloriva-catalog .cycloriva-container,
+.cycloriva-catalog-loading .cycloriva-container {
+  width: 100%;
+  max-width: none;
+  padding-inline: clamp(0.75rem, 2vw, 2.5rem);
+}

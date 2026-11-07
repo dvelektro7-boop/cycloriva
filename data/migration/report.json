@@ -1,0 +1,17 @@
+{
+  "products": 401,
+  "productsWithImages": 0,
+  "importedImages": 0,
+  "missingImages": 2210,
+  "missingNames": [
+    "886",
+    "1714",
+    "2719",
+    "2833"
+  ],
+  "missingPrices": [
+    "1982"
+  ],
+  "missingDescriptions": [],
+  "pricesDifferentFromRegularExport": []
+}

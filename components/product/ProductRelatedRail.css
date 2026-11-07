@@ -1,0 +1,10 @@
+.product-related-carousel { position: relative; min-width: 0; }
+.product-related-controls { position: absolute; right: 0; bottom: calc(100% + 8px); display: flex; justify-content: flex-end; gap: 6px; }
+.product-related-controls button { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid #dce5e9; border-radius: 50%; color: #102b39; background: white; cursor: pointer; }
+.product-related-controls button:hover { color: #078b17; border-color: #078b17; }
+.product-related-rail { display: flex; align-items: stretch; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; padding: 2px 2px 8px; cursor: grab; scrollbar-width: thin; scrollbar-color: #a8bdab transparent; }
+.product-related-rail:active { cursor: grabbing; user-select: none; }
+.product-related-rail > [data-component="related-product-card"] { flex: 0 0 calc((100% - 28px) / 2); height: auto; min-width: 150px; }
+.product-related-rail:focus-visible, .product-related-controls button:focus-visible { outline: 2px solid #078b17; outline-offset: 2px; }
+@media (min-width: 640px) { .product-related-rail > [data-component="related-product-card"] { flex-basis: calc((100% - 44px) / 3); } }
+@media (min-width: 1024px) { .product-related-rail > [data-component="related-product-card"] { flex-basis: calc((100% - 60px) / 4); } }

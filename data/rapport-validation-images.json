@@ -1,0 +1,59 @@
+{
+  "productCount": 401,
+  "withImagesBefore": 3,
+  "withImagesAfter": 27,
+  "readableLocalImages": 153,
+  "nonImageFieldsUnchanged": true,
+  "historicalManifestUnchanged": true,
+  "existingImageFilesUnchanged": 33,
+  "listAndDetailHttpChecks": [
+    {
+      "id": "818",
+      "images": 12
+    },
+    {
+      "id": "826",
+      "images": 9
+    },
+    {
+      "id": "833",
+      "images": 12
+    },
+    {
+      "id": "840",
+      "images": 5
+    },
+    {
+      "id": "1008",
+      "images": 5
+    },
+    {
+      "id": "1071",
+      "images": 5
+    },
+    {
+      "id": "1079",
+      "images": 5
+    },
+    {
+      "id": "2444",
+      "images": 5
+    },
+    {
+      "id": "2462",
+      "images": 5
+    },
+    {
+      "id": "860",
+      "images": 0
+    },
+    {
+      "id": "894",
+      "images": 0
+    },
+    {
+      "id": "869",
+      "images": 0
+    }
+  ]
+}
