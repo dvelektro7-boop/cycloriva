@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local audits, screenshots and catalogue backups (not deployment inputs)
+/.image-work/
+/data/**/*.backup-*
+/data/**/backups/
+/data/**/*.tmp

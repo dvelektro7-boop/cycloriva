@@ -1,12 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
   experimental: {
-    // Avoid reusing the damaged on-disk compilation cache in development.
-    turbopackFileSystemCacheForDev: false,
+    // Keep production prerendering within the resources of small build runners.
+    cpus: 2,
+    staticGenerationMaxConcurrency: 4,
   },
   turbopack: {
     rules: {
