@@ -5,7 +5,7 @@
 - Framework : Next.js, serveur Node.js (pas d'export statique).
 - Node.js : 22.12 minimum sur la branche 22, ou Node.js 24.
 - Installation : `npm ci` (le postinstall génère le client Prisma).
-- Compilation : `npm run build`.
+- Compilation : `npm run build` (exécute `next build --webpack`).
 - Démarrage : `npm run start` ; utiliser le répertoire de sortie par défaut du framework.
 - Conserver les dépendances de développement pendant l'installation et la compilation : Tailwind et Prisma en ont besoin.
 
@@ -37,7 +37,15 @@ Vérifier ensuite l'accueil, le catalogue, une fiche produit et le panier, puis 
 
 Le build local du 7 novembre 2026 a réussi et généré 133 pages. La capture de l'hébergeur montre un message générique ; elle ne prouve pas un manque de mémoire. Les limites mémoire, la durée maximale et les journaux complets du runner restent nécessaires si l'échec se reproduit.
 
-La configuration limite le travail de prérendu à deux workers et quatre pages simultanées par worker pour réduire les pointes mémoire. Le catalogue actif reste inchangé. Le chargeur Tailwind Turbopack est nécessaire à cette configuration CSS.
+La configuration limite le travail de prérendu à deux workers et quatre pages simultanées par worker pour réduire les pointes mémoire. Le catalogue actif reste inchangé. Tailwind est compilé via `@tailwindcss/postcss`, compatible avec Webpack et le serveur de développement.
+
+### Compatibilité Hostinger (8 novembre 2026)
+
+Hostinger indique que Next.js 16.3.3 et versions suivantes doivent être compilées avec Webpack : leur environnement de build ne fournit pas la version de glibc exigée par Turbopack. Le projet utilise Next.js 16.4.5 ; `npm run build` sélectionne donc explicitement Webpack.
+
+Source : https://www.hostinger.com/support/how-to-fix-next-js-16-turbopack-build-errors-on-hostinger/
+
+Si le tableau de bord reste en « Compilation en cours » avec des journaux vides, le démarrage effectif de la compilation n'est pas confirmé. Demander au support Hostinger de vérifier et débloquer le job avant de relancer. Vider le cache du site ne débloque pas un job de déploiement.
 
 Les captures `.image-work`, sauvegardes `data/**/*.backup-*`, dossiers `data/**/backups` et fichiers temporaires sont exclus du suivi Git et conservés localement. `.next` est déjà ignoré et aucun fichier de ce dossier n'était versionné. Aucun second fichier `next.config` n'était présent dans le dépôt audité.
 

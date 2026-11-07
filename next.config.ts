@@ -8,14 +8,6 @@ const nextConfig: NextConfig = {
     cpus: 2,
     staticGenerationMaxConcurrency: 4,
   },
-  turbopack: {
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
-      },
-    },
-  },
 };
 
 export default nextConfig;
