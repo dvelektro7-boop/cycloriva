@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import Link from "next/link";
+import { productImageUrl } from "@/lib/product-images";
 
 import {
   AlertCircle,
@@ -346,7 +347,7 @@ function CartProductImage({
   image: string | null;
   name: string;
 }) {
-  const src = safeImageUrl(image);
+  const src = safeImageUrl(image ? productImageUrl(image) : image);
 
   return (
     <div

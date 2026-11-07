@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import Link from "next/link";
+import { productImageUrl } from "@/lib/product-images";
 
 import {
   AlertCircle,
@@ -291,7 +292,7 @@ function ProductThumbnail({
   image: string | null;
   name: string;
 }) {
-  const safeImage = getSafeProductImage(image);
+  const safeImage = getSafeProductImage(image ? productImageUrl(image) : image);
 
   return (
     <div className="flex h-18 w-18 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#e0e6eb] bg-[#fafcfd] sm:h-20 sm:w-20">

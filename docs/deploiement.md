@@ -23,6 +23,10 @@ Appliquer les migrations avec `npm run db:migrate` avant d'ouvrir le trafic sur 
 
 ## Validation avant publication
 
+Les 4 848 photos produits sont stockées dans Git LFS (environ 489 MiB). Hostinger peut cloner uniquement les pointeurs texte. `lib/product-images.ts` transforme donc les chemins `/images/produits/...` du catalogue en URL média publique du dépôt GitHub, qui sert les originaux LFS. Les composants chargent ces images directement, sans optimiseur Next.js. Les anciens chemins stockés dans le panier sont également convertis à l'affichage. Le catalogue JSON et ses prix restent inchangés.
+
+Cette solution dépend de la disponibilité de GitHub et de la bande passante Git LFS du compte ; le dépôt doit rester public. Pour un stockage marchand pérenne, migrer ensuite les originaux vers un stockage/CDN dédié et modifier la base d'URL centralisée. Aucun téléchargement intégral des images n'est requis pendant le build.
+
 ```sh
 npm ci
 npm run check

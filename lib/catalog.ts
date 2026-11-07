@@ -1,5 +1,6 @@
 
 import productsData from "@/data/products.json";
+import { productImageUrl } from "@/lib/product-images";
 
 // =====================================================
 // CYCLORIVA — CATALOGUE CENTRAL
@@ -239,7 +240,7 @@ function normalizeProduct(raw: Partial<Product>): Product {
               (value): value is string =>
                 typeof value === "string"
             )
-            .map((value) => value.trim())
+            .map((value) => productImageUrl(value.trim()))
             .filter(Boolean)
         )
       )
