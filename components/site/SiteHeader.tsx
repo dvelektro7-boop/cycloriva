@@ -1,10 +1,22 @@
-"use client";
-import Image from "next/image";
 
+"use client";
+
+import Image from "next/image";
 import Link from "next/link";
+
 import { ProductCartLink } from "@/components/product/ProductCartLink";
-import { usePathname, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+
+import {
+  usePathname,
+  useSearchParams,
+} from "next/navigation";
+
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
 import {
   ChevronDown,
   ChevronRight,
@@ -18,19 +30,39 @@ import {
   Bike,
   Package,
   Mail,
+  type LucideIcon,
 } from "lucide-react";
 
 import {
   siteLocales,
   siteText,
+  switchSiteLocale,
   type SiteLocale,
   type SiteTextKey,
 } from "@/lib/site-i18n";
 
+// =========================================================
+// CYCLORIVA — HEADER PUBLIC
+// =========================================================
+//
+// Navigation responsive PC / mobile.
+// Traductions via lib/site-i18n.ts → messages/*.json.
+//
+// Préservation :
+// - Logo officiel
+// - Recherche
+// - Navigation
+// - Favoris
+// - Panier
+// - Sélecteur des cinq langues
+// - Menu latéral mobile
+// - Identité visuelle
+// =========================================================
+
 type NavigationItem = {
   key: SiteTextKey;
   href: (locale: SiteLocale) => string;
-  icon: typeof Bike;
+  icon: LucideIcon;
   submenu?: boolean;
 };
 
@@ -39,13 +71,24 @@ type SiteHeaderProps = {
   languageUrl?: (locale: string) => string;
 };
 
-const productPath = (locale: SiteLocale, search?: string) => {
+// =========================================================
+// ROUTES PRODUITS
+// =========================================================
+
+const productPath = (
+  locale: SiteLocale,
+  search?: string
+) => {
   const base = `/${locale}/produits`;
 
   if (!search) return base;
 
   return `${base}?q=${encodeURIComponent(search)}`;
 };
+
+// =========================================================
+// NAVIGATION PRINCIPALE
+// =========================================================
 
 const navigationItems: NavigationItem[] = [
   {
@@ -101,7 +144,14 @@ const navigationItems: NavigationItem[] = [
   },
 ];
 
-export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
+// =========================================================
+// COMPOSANT PRINCIPAL
+// =========================================================
+
+export function SiteHeader({
+  locale,
+  languageUrl,
+}: SiteHeaderProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -114,35 +164,47 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
   const tr = (key: SiteTextKey) => siteText(locale, key);
 
   const currentPath = pathname ?? `/${locale}`;
-  const isHomePage = currentPath.replace(/\/+$/, "") === `/${locale}`;
 
-  const getLanguageUrl = (language: SiteLocale) => {
+  const isHomePage =
+    currentPath.replace(/\/+$/, "") === `/${locale}`;
+
+  // =======================================================
+  // CHANGEMENT DE LANGUE
+  // =======================================================
+
+  const getLanguageUrl = (
+    language: SiteLocale
+  ): string => {
     if (languageUrl) {
       return languageUrl(language);
     }
 
-    const segments = currentPath.split("/");
-
-    if (segments.length > 1) {
-      segments[1] = language;
-    }
-
-    const nextPath = segments.join("/");
     const query = searchParams.toString();
 
-    return query ? `${nextPath}?${query}` : nextPath;
+    const fullPath = query
+      ? `${currentPath}?${query}`
+      : currentPath;
+
+    return switchSiteLocale(fullPath, language);
   };
 
-  // Fermer les menus lors du changement de page.
+  // =======================================================
+  // FERMETURE DES MENUS APRÈS NAVIGATION
+  // =======================================================
+
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       setDrawerOpen(false);
       setSearchOpen(false);
     });
+
     return () => cancelAnimationFrame(frame);
   }, [pathname]);
 
-  // Gérer la fermeture du menu et le défilement mobile.
+  // =======================================================
+  // MENU MOBILE : ACCESSIBILITÉ
+  // =======================================================
+
   useEffect(() => {
     if (!drawerOpen) return;
 
@@ -152,42 +214,65 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
 
     document.body.style.overflow = "hidden";
 
-    const focusable = drawerRef.current?.querySelectorAll<HTMLElement>(
-      'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
-    );
+    const focusableSelector =
+      'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    const focusable =
+      drawerRef.current?.querySelectorAll<HTMLElement>(
+        focusableSelector
+      );
 
     focusable?.[0]?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        event.preventDefault();
         setDrawerOpen(false);
+        return;
       }
 
-      if (event.key === "Tab") {
-        const elements = drawerRef.current?.querySelectorAll<HTMLElement>(
-          'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      if (event.key !== "Tab") return;
+
+      const elements =
+        drawerRef.current?.querySelectorAll<HTMLElement>(
+          focusableSelector
         );
 
-        if (!elements || elements.length === 0) return;
+      if (!elements || elements.length === 0) {
+        event.preventDefault();
+        return;
+      }
 
-        const first = elements[0];
-        const last = elements[elements.length - 1];
+      const first = elements[0];
+      const last = elements[elements.length - 1];
 
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first.focus();
-        }
+      if (
+        event.shiftKey &&
+        document.activeElement === first
+      ) {
+        event.preventDefault();
+        last.focus();
+      } else if (
+        !event.shiftKey &&
+        document.activeElement === last
+      ) {
+        event.preventDefault();
+        first.focus();
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      document.removeEventListener("keydown", handleKeyDown);
+
+      document.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
 
       if (previouslyFocused instanceof HTMLElement) {
         previouslyFocused.focus();
@@ -197,17 +282,27 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
     };
   }, [drawerOpen]);
 
+  // =======================================================
+  // SÉLECTEUR DES CINQ LANGUES
+  // =======================================================
+
   const languageLinks = (
     <nav
       aria-label={tr("languages")}
-      className="flex items-center justify-center gap-1 text-[12px] font-semibold text-[#102b39]"
+      className="flex items-center justify-center gap-1 text-[12px] font-semibold text-[#102b39] sm:text-[13px]"
     >
       {siteLocales.map((language, index) => (
-        <span key={language} className="inline-flex items-center gap-1">
+        <span
+          key={language}
+          className="inline-flex items-center gap-1"
+        >
           <Link
             href={getLanguageUrl(language)}
             lang={language}
-            aria-current={locale === language ? "page" : undefined}
+            hrefLang={language}
+            aria-current={
+              locale === language ? "page" : undefined
+            }
             onClick={() => setDrawerOpen(false)}
             className={`rounded-full px-2 py-1 transition-colors ${
               locale === language
@@ -219,7 +314,10 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
           </Link>
 
           {index < siteLocales.length - 1 && (
-            <span className="text-slate-300" aria-hidden="true">
+            <span
+              className="text-slate-300"
+              aria-hidden="true"
+            >
               |
             </span>
           )}
@@ -228,34 +326,51 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
     </nav>
   );
 
+  // =======================================================
+  // AFFICHAGE
+  // =======================================================
+
   return (
     <>
       <header className="relative z-40 w-full border-b border-slate-200 bg-white text-[#102b39] shadow-sm">
-        {/* =========================================
+
+        {/* ===============================================
             VERSION PC : EN-TÊTE PRINCIPAL
-        ========================================= */}
+        =============================================== */}
 
         <div className="hidden h-19 w-full min-w-0 items-center gap-7 px-7 lg:flex xl:px-12">
+
           {/* LOGO OFFICIEL */}
-          <Link href={`/${locale}`} className="shrink-0" aria-label="CYCLORIVA">
+
+          <Link
+            href={`/${locale}`}
+            className="shrink-0"
+            aria-label="CYCLORIVA"
+          >
             <Image
               width={2172}
               height={724}
               sizes="(max-width: 639px) 144px, 160px"
               src="/images/logo.png"
               alt="CYCLORIVA"
+              priority
               className="h-12 w-auto max-w-71.25 object-contain"
             />
           </Link>
 
           {/* RECHERCHE PC */}
+
           <form
             action={`/${locale}/produits`}
             method="GET"
             role="search"
             className="mx-auto flex h-11 min-w-0 max-w-122.5 flex-1 items-center overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm focus-within:border-[#2ebc18]"
           >
-            <Search size={18} className="ml-4 shrink-0 text-slate-500" />
+            <Search
+              size={18}
+              aria-hidden="true"
+              className="ml-4 shrink-0 text-slate-500"
+            />
 
             <input
               type="search"
@@ -275,9 +390,11 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
           </form>
 
           {/* LANGUES PC */}
+
           {languageLinks}
 
           {/* ACTIONS PC */}
+
           <div className="flex shrink-0 items-center gap-4">
             <button
               type="button"
@@ -289,7 +406,10 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
               <UserRound size={23} />
             </button>
 
-            <Link href={"/" + locale + "/favoris"} aria-label={tr("favorites")}>
+            <Link
+              href={`/${locale}/favoris`}
+              aria-label={tr("favorites")}
+            >
               <Heart size={24} />
             </Link>
 
@@ -297,9 +417,9 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
           </div>
         </div>
 
-        {/* =========================================
-            VERSION PC : MENU HORIZONTAL
-        ========================================= */}
+        {/* ===============================================
+            VERSION PC : NAVIGATION HORIZONTALE
+        =============================================== */}
 
         <nav
           aria-label={tr("menu")}
@@ -310,7 +430,9 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
               key={item.key}
               href={item.href(locale)}
               aria-current={
-                item.key === "home" && isHomePage ? "page" : undefined
+                item.key === "home" && isHomePage
+                  ? "page"
+                  : undefined
               }
               className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md px-3 text-[13px] font-bold transition-colors ${
                 item.key === "home" && isHomePage
@@ -320,21 +442,30 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
                     : "hover:bg-slate-100"
               }`}
             >
-              {item.key === "promotions" && <Tag size={15} />}
+              {item.key === "promotions" && (
+                <Tag size={15} aria-hidden="true" />
+              )}
 
               <span>{tr(item.key)}</span>
 
-              {item.submenu && <ChevronDown size={13} aria-hidden="true" />}
+              {item.submenu && (
+                <ChevronDown
+                  size={13}
+                  aria-hidden="true"
+                />
+              )}
             </Link>
           ))}
         </nav>
 
-        {/* =========================================
+        {/* ===============================================
             VERSION MOBILE : EN-TÊTE
-        ========================================= */}
+        =============================================== */}
 
         <div className="flex h-17.25 items-center gap-2 px-3 sm:px-5 lg:hidden">
+
           {/* BOUTON MENU */}
+
           <button
             ref={menuButtonRef}
             type="button"
@@ -348,6 +479,7 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
           </button>
 
           {/* LOGO */}
+
           <Link
             href={`/${locale}`}
             className="min-w-0 flex-1"
@@ -359,22 +491,28 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
               sizes="(max-width: 639px) 144px, 160px"
               src="/images/logo.png"
               alt="CYCLORIVA"
+              priority
               className="h-9.25 w-auto max-w-47.5 object-contain object-left sm:max-w-57.5"
             />
           </Link>
 
-          {/* RECHERCHE */}
+          {/* RECHERCHE MOBILE */}
+
           <button
             type="button"
             aria-label={tr("searchButton")}
             aria-expanded={searchOpen}
-            onClick={() => setSearchOpen((open) => !open)}
+            aria-controls="cycloriva-mobile-search"
+            onClick={() =>
+              setSearchOpen((open) => !open)
+            }
             className="rounded-md p-1.5 hover:bg-slate-100"
           >
             <Search size={22} />
           </button>
 
           {/* COMPTE */}
+
           <button
             type="button"
             disabled
@@ -386,17 +524,21 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
           </button>
 
           {/* PANIER */}
+
           <ProductCartLink locale={locale} />
         </div>
 
         {/* LANGUES MOBILE */}
+
         <div className="flex h-11 items-center justify-center border-t border-slate-100 lg:hidden">
           {languageLinks}
         </div>
 
         {/* RECHERCHE MOBILE DÉPLIABLE */}
+
         {searchOpen && (
           <form
+            id="cycloriva-mobile-search"
             action={`/${locale}/produits`}
             method="GET"
             role="search"
@@ -422,9 +564,9 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
         )}
       </header>
 
-      {/* =========================================
+      {/* ===============================================
           MENU LATÉRAL MOBILE
-      ========================================= */}
+      =============================================== */}
 
       {drawerOpen && (
         <div
@@ -432,6 +574,7 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
           className="fixed inset-0 z-100 lg:hidden"
         >
           {/* FOND SOMBRE */}
+
           <button
             type="button"
             className="absolute inset-0 bg-[#071827]/60"
@@ -440,6 +583,7 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
           />
 
           {/* PANNEAU DU MENU */}
+
           <aside
             ref={drawerRef}
             role="dialog"
@@ -447,8 +591,11 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
             aria-label={tr("menu")}
             className="absolute left-0 top-0 flex h-full w-[min(88vw,370px)] flex-col overflow-y-auto bg-white shadow-2xl"
           >
+
             {/* HAUT DU PANNEAU */}
+
             <div className="flex min-h-24 items-center justify-between gap-3 bg-[#102b39] px-4">
+
               <div className="rounded-md bg-white px-2 py-1">
                 <Image
                   width={2172}
@@ -471,7 +618,11 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
             </div>
 
             {/* LIENS DU MENU */}
-            <nav aria-label={tr("menu")} className="flex-1 p-4">
+
+            <nav
+              aria-label={tr("menu")}
+              className="flex-1 p-4"
+            >
               {navigationItems.map((item) => {
                 const Icon = item.icon;
 
@@ -480,9 +631,13 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
                     key={item.key}
                     href={item.href(locale)}
                     aria-current={
-                      item.key === "home" && isHomePage ? "page" : undefined
+                      item.key === "home" && isHomePage
+                        ? "page"
+                        : undefined
                     }
-                    onClick={() => setDrawerOpen(false)}
+                    onClick={() =>
+                      setDrawerOpen(false)
+                    }
                     className={`flex min-h-14 items-center gap-4 border-b border-slate-100 px-3 py-2 text-[15px] font-semibold transition-colors ${
                       item.key === "home" && isHomePage
                         ? "rounded-lg bg-[#ebf9e6] text-[#148f0a]"
@@ -491,12 +646,22 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
                           : "text-[#102b39] hover:bg-slate-50"
                     }`}
                   >
-                    <Icon size={22} strokeWidth={1.7} />
+                    <Icon
+                      size={22}
+                      strokeWidth={1.7}
+                      aria-hidden="true"
+                    />
 
-                    <span className="flex-1">{tr(item.key)}</span>
+                    <span className="flex-1">
+                      {tr(item.key)}
+                    </span>
 
                     {item.key !== "home" && (
-                      <ChevronRight size={18} className="text-slate-400" />
+                      <ChevronRight
+                        size={18}
+                        className="text-slate-400"
+                        aria-hidden="true"
+                      />
                     )}
                   </Link>
                 );
@@ -504,6 +669,7 @@ export function SiteHeader({ locale, languageUrl }: SiteHeaderProps) {
             </nav>
 
             {/* BAS DU MENU */}
+
             <div className="border-t border-slate-200 bg-slate-50 px-4 py-5">
               {languageLinks}
             </div>

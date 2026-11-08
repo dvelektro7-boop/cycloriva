@@ -2,23 +2,25 @@ import { promotionPrices } from "@/lib/promotions";
 
 import productsData from "@/data/products.json";
 import { productImageUrl } from "@/lib/product-images";
+import { catalogText, catalogTranslation } from "@/lib/catalog-translations";
+import {
+  siteMessage,
+  siteIntlLocales,
+  isSiteLocale,
+  type SiteLocale,
+} from "@/lib/site-i18n";
 
 // =====================================================
 // CYCLORIVA — CATALOGUE CENTRAL
 // =====================================================
 //
-// Ce module gère :
-// - Les produits
-// - Les catégories
-// - Les images
-// - Les prix
-// - Les descriptions
-// - Les caractéristiques
-// - Les traductions
-// - Les sélections pour l'accueil
+// Produits, catégories, images, prix, descriptions,
+// caractéristiques, traductions et accueil.
 //
-// Source actuelle : data/products.json
+// Source produits : data/products.json
+// Source interface : messages/*.json
 //
+// Compatible Next.js 16 / TypeScript.
 // =====================================================
 
 // =====================================================
@@ -40,7 +42,7 @@ export const defaultLocale: Locale = "fr";
 export function isLocale(
   value: string
 ): value is Locale {
-  return locales.some((locale) => locale === value);
+  return isSiteLocale(value);
 }
 
 // =====================================================
@@ -335,6 +337,7 @@ export function searchProducts(
       localized.name,
       stripHtml(product.shortDescription),
       stripHtml(product.description),
+      stripHtml(localized.shortDescription),
       stripHtml(localized.description),
       product.sku,
       ...product.categories,
@@ -416,8 +419,6 @@ export function getHomeCategories(
 ): CatalogCategory[] {
   const categories = getCatalogCategories();
 
-  // Priorité visuelle adaptée au catalogue CYCLORIVA.
-  // Les catégories doivent exister dans les données.
   const keywords = [
     ["électrique", "electric", "e-bike"],
     ["vtt", "mountain"],
@@ -449,7 +450,6 @@ export function getHomeCategories(
     }
   }
 
-  // Compléter avec de vraies catégories.
   for (const category of [...categories].sort(
     (a, b) => b.count - a.count
   )) {
@@ -470,15 +470,6 @@ export function getHomeCategories(
 // =====================================================
 // 9. PRODUITS POUR LA PAGE D'ACCUEIL
 // =====================================================
-
-/**
- * Sélectionne des produits réellement présents.
- *
- * Aucune promotion ou nouveauté n'est inventée.
- *
- * Une véritable sélection éditoriale pourra être
- * ajoutée lors de la création de l'administration.
- */
 
 export function getHomeProducts(
   limit = 8
@@ -512,10 +503,18 @@ export function getProductsWithImages(
 }
 
 // =====================================================
-// 10. MESSAGES DU CATALOGUE
+// 10. TRADUCTIONS DU CATALOGUE
+// =====================================================
+//
+// Priorité aux fichiers messages/*.json.
+//
+// Les traductions historiques restent disponibles
+// si une clé n'existe pas encore dans les JSON.
+//
+// Cela évite de casser les composants existants.
 // =====================================================
 
-const messages = {
+const catalogFallbackMessages = {
   fr: {
     home: "Boutique",
     products: "Produits",
@@ -642,13 +641,61 @@ const messages = {
   },
 } as const;
 
-export type MessageKey = keyof typeof messages.fr;
+export type MessageKey =
+  keyof typeof catalogFallbackMessages.fr;
+
+/*
+ * Correspondances entre les anciennes clés du
+ * catalogue et les chemins des fichiers JSON.
+ *
+ * Une correspondance n'est utilisée que si
+ * elle existe réellement dans le dictionnaire.
+ */
+const catalogMessagePaths: Partial<
+  Record<MessageKey, string>
+> = {
+  home: "footer.store",
+  products: "catalog.products",
+  search: "catalog.search",
+  all: "catalog.allCategories",
+  result: "catalog.results",
+  details: "catalog.viewProduct",
+  back: "catalog.back",
+  description: "product.description",
+  specifications: "product.specifications",
+  images: "product.images",
+  priceMissing: "product.priceMissing",
+  stock: "product.inStock",
+  available: "product.available",
+  unavailable: "product.unavailable",
+  warning: "catalog.warning",
+  translation: "product.translationNotice",
+  category: "catalog.category",
+  none: "catalog.noProducts",
+  imageMissing: "product.imageMissing",
+  reference: "product.reference",
+  price: "product.price",
+};
 
 export function t(
   locale: Locale,
   key: MessageKey
 ): string {
-  return messages[locale][key];
+  const path = catalogMessagePaths[key];
+
+  if (path) {
+    const translated = siteMessage(
+      locale as SiteLocale,
+      path
+    );
+
+    // siteMessage renvoie le chemin si la clé manque.
+    if (translated !== path) {
+      return translated;
+    }
+  }
+
+  return catalogFallbackMessages[locale][key];
 }
 
 // =====================================================
@@ -677,18 +724,13 @@ export function formatPrice(
     return t(locale, "priceMissing");
   }
 
-  const formats: Record<Locale, string> = {
-    fr: "fr-FR",
-    en: "en-IE",
-    de: "de-DE",
-    it: "it-IT",
-    es: "es-ES",
-  };
-
-  return new Intl.NumberFormat(formats[locale], {
-    style: "currency",
-    currency: "EUR",
-  }).format(price);
+  return new Intl.NumberFormat(
+    siteIntlLocales[locale],
+    {
+      style: "currency",
+      currency: "EUR",
+    }
+  ).format(price);
 }
 
 // =====================================================
@@ -758,7 +800,7 @@ export function stripHtml(
       " "
     )
     .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/(?:p|div|li|h[1-6])\s*>/gi, "\n")
+    .replace(/<\/?(?:p|div|li|h[1-6])\s*>/gi, "\n")
     .replace(/<[^>]*>/g, " ");
 
   return decodeHtmlEntities(cleaned)
@@ -780,15 +822,15 @@ export function localizedProduct(
   const translation = product.translations[locale];
 
   const translatedName = repairText(
-    translation?.name
+    translation?.name || catalogTranslation(product.name, locale)
   ).trim();
 
   const translatedShort = repairText(
-    translation?.shortDescription
+    translation?.shortDescription || catalogTranslation(product.shortDescription, locale)
   ).trim();
 
   const translatedDescription = repairText(
-    translation?.description
+    translation?.description || catalogTranslation(product.description, locale)
   ).trim();
 
   const name =
@@ -802,8 +844,6 @@ export function localizedProduct(
   const description =
     translatedDescription || product.description;
 
-  // Une traduction n'est complète que lorsque
-  // les champs nécessaires sont traduits.
   const translated =
     locale === "fr" ||
     Boolean(
@@ -903,8 +943,8 @@ export function productSpecifications(
   )) {
     if (value) {
       entries.push([
-        repairText(name),
-        repairText(value),
+        catalogText(repairText(name), locale),
+        catalogText(repairText(value), locale),
       ]);
     }
   }

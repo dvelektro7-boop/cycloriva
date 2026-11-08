@@ -1,5 +1,6 @@
 import { isAllowedCheckoutOrigin } from "@/lib/checkout-origin";
 import { allowCheckoutRequest } from "@/lib/checkout-rate-limit";
+import { isSiteLocale } from "@/lib/site-i18n";
 import { NextRequest, NextResponse } from "next/server";
 import {
   calculateCheckoutPricing,
@@ -59,6 +60,7 @@ export async function POST(request: NextRequest) {
         { status: 422 },
       );
     const pricing = await calculateCheckoutPricing({
+      locale: isSiteLocale(body?.locale) ? body.locale : "fr",
       country: country.data,
       items: items.data,
     });

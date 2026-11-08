@@ -1,4 +1,6 @@
 "use client";
+import { accessibilityLabel } from "@/lib/accessibility-i18n";
+
 import "@/components/site/InformationPages.css";
 import { Suspense, use } from "react";
 
@@ -962,7 +964,7 @@ function CookieManagementPageContent({
         {/* Fil d'Ariane */}
 
         <nav
-          aria-label="Breadcrumb"
+          aria-label={accessibilityLabel(locale, "breadcrumb")}
           className="flex flex-wrap items-center gap-2 py-1 text-xs"
         >
           <Link

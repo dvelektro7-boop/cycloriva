@@ -3,6 +3,7 @@
 
 import {
   Suspense,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 
@@ -48,7 +49,8 @@ type SiteChromeProps = {
 function buildLanguageUrl(
   pathname: string,
   nextLocale: SiteLocale,
-  queryString: string
+  queryString: string,
+  hash: string
 ): string {
   const segments = pathname.split("/");
 
@@ -56,7 +58,7 @@ function buildLanguageUrl(
   if (pathname === "/" || pathname === "") {
     return `/${nextLocale}${
       queryString ? `?${queryString}` : ""
-    }`;
+    }${hash}`;
   }
 
   // Remplacer la langue existante.
@@ -71,7 +73,12 @@ function buildLanguageUrl(
 
   return `${nextPath}${
     queryString ? `?${queryString}` : ""
-  }`;
+  }${hash}`;
+}
+
+function subscribeHashChange(callback: () => void) {
+  window.addEventListener("hashchange", callback);
+  return () => window.removeEventListener("hashchange", callback);
 }
 
 // =====================================================
@@ -93,6 +100,7 @@ function SiteChromeContent({
 
   // Conserver les paramètres de recherche.
   const currentQuery = searchParams?.toString() ?? "";
+  const currentHash = useSyncExternalStore(subscribeHashChange, () => window.location.hash, () => "");
 
   // Générer le lien vers une autre langue.
   const languageUrl = (nextLocale: string): string => {
@@ -101,7 +109,8 @@ function SiteChromeContent({
     return buildLanguageUrl(
       currentPathname,
       targetLocale,
-      currentQuery
+      currentQuery,
+      currentHash
     );
   };
 

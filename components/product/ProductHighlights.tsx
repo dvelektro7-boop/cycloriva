@@ -1,5 +1,6 @@
 import { getProductTranslations, PRODUCT_LOCALES } from "@/lib/product-i18n";
 import { descriptionSpecifications } from "@/lib/product-content";
+import { catalogText } from "@/lib/catalog-translations";
 
 import {
   BatteryCharging,
@@ -499,7 +500,8 @@ function HighlightCard({
   const text = translations[locale];
 
   const label =
-    item.label || text[item.key];
+    item.label ? catalogText(item.label, locale) : text[item.key];
+  const value = catalogText(item.value, locale);
 
   return (
     <div
@@ -556,9 +558,9 @@ function HighlightCard({
             "text-slate-600",
             "xl:text-[11px]",
           ].join(" ")}
-          title={item.value}
+          title={value}
         >
-          {item.value}
+          {value}
         </p>
       </div>
     </div>

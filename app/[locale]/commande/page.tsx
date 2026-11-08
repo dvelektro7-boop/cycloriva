@@ -1,3 +1,4 @@
+import { accessibilityLabel } from "@/lib/accessibility-i18n";
 import "@/components/checkout/Checkout.css";
 
 import "server-only";
@@ -251,7 +252,7 @@ async function CheckoutPageContent({
       ==================================================== */}
 
       <section
-        aria-label="Checkout"
+        aria-label={accessibilityLabel(locale, "checkout")}
         className="checkout-container pt-3 sm:pt-4 lg:pt-2"
       >
         <CheckoutClient

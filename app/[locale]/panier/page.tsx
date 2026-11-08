@@ -1,3 +1,4 @@
+import { accessibilityLabel } from "@/lib/accessibility-i18n";
 import "@/components/cart/Cart.css";
 import { Suspense } from "react";
 
@@ -279,7 +280,7 @@ function CartBreadcrumb({
 
   return (
     <nav
-      aria-label="Breadcrumb"
+      aria-label={accessibilityLabel(locale, "breadcrumb")}
       className="flex min-w-0 flex-wrap items-center gap-2 py-4 text-[11px] leading-5 text-[#344e60] sm:py-5 sm:text-[12px]"
     >
       <Link

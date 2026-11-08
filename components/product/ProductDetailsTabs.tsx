@@ -2,6 +2,7 @@
 "use client";
 
 import { getProductTranslations, PRODUCT_LOCALES } from "@/lib/product-i18n";
+import { catalogText } from "@/lib/catalog-translations";
 
 
 import {
@@ -255,8 +256,8 @@ export function getProductTechnicalRows(
     seen.add(key);
 
     rows.push({
-      label: cleanLabel,
-      value: cleanValue,
+      label: catalogText(cleanLabel, locale),
+      value: catalogText(cleanValue, locale),
     });
   }
 

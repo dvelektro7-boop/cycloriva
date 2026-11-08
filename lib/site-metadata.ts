@@ -1,12 +1,4 @@
-
 import type { Metadata, Viewport } from "next";
-import type { ReactNode } from "react";
-
-import "./globals.css";
-
-// ==========================================
-// CYCLORIVA — CONFIGURATION GÉNÉRALE
-// ==========================================
 
 const SITE_NAME = "CYCLORIVA";
 
@@ -96,22 +88,3 @@ export const viewport: Viewport = {
 // ROOT LAYOUT
 // ==========================================
 
-type RootLayoutProps = {
-  children: ReactNode;
-};
-
-export default function RootLayout({
-  children,
-}: RootLayoutProps) {
-  return (
-    <html
-      lang="fr"
-      className="h-full antialiased"
-      suppressHydrationWarning
-    >
-      <body className="flex min-h-screen flex-col bg-white text-[#102b39]">
-        {children}
-      </body>
-    </html>
-  );
-}

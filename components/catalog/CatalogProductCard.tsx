@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 
 import type { Product } from "@/lib/catalog";
+import { localizedProduct } from "@/lib/catalog";
+import { catalogText } from "@/lib/catalog-translations";
 import type { SiteLocale } from "@/lib/site-i18n";
 import type { CatalogView } from "@/components/catalog/CatalogToolbar";
 
@@ -458,18 +460,16 @@ export function CatalogProductCard({
   const text = translations[currentLocale];
 
   const imageSrc = getProductImage(product);
-  const category = getCategoryLabel(product);
+  const rawCategory = getCategoryLabel(product);
+  const category = rawCategory ? catalogText(rawCategory, currentLocale) : null;
   const price = getProductPriceDetails(product);
   const stock = getStockDisplay(product, text);
 
-  const name =
-    typeof product.name === "string" &&
-    product.name.trim()
-      ? product.name.trim()
-      : String(product.id);
+  const localized = localizedProduct(product, currentLocale);
+  const name = localized.name;
 
   const description = cleanDescription(
-    product.shortDescription
+    localized.shortDescription
   );
 
   const productUrl = `/${currentLocale}/produits/${encodeURIComponent(

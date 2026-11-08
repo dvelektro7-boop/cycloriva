@@ -14,6 +14,7 @@ import {
 } from "@/lib/catalog";
 
 import { resolveLocale, type SiteLocale } from "@/lib/site-i18n";
+import { catalogText } from "@/lib/catalog-translations";
 
 // =====================================================
 // CYCLORIVA — PRODUITS DE LA PAGE D'ACCUEIL
@@ -304,7 +305,7 @@ function ProductCard({
               text-slate-500 sm:text-xs
             "
           >
-            {product.categories[0]}
+            {catalogText(product.categories[0], locale)}
           </p>
         )}
 

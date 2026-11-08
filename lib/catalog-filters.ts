@@ -26,6 +26,8 @@
  */
 
 import type { Product } from "@/lib/catalog";
+import { localizedProduct } from "@/lib/catalog";
+import { catalogText } from "@/lib/catalog-translations";
 import type { SiteLocale } from "@/lib/site-i18n";
 
 import type {
@@ -471,7 +473,7 @@ export function getCatalogCategoryOptions(
 
       labels.set(
         value,
-        key ? categoryLabels[language][key] : category
+        key ? categoryLabels[language][key] : catalogText(category, language)
       );
 
       // Évite de compter deux fois une même catégorie
@@ -624,13 +626,18 @@ export function getCatalogPriceBounds(
 // 9. RECHERCHE TEXTUELLE
 // ============================================================
 
-function getSearchableText(product: Product): string {
+function getSearchableText(product: Product, locale: SiteLocale): string {
+  const localized = localizedProduct(product, locale);
   const values = [
+    localized.name,
+    localized.shortDescription,
+    localized.description,
     product.name,
     product.sku,
     product.shortDescription,
     getCatalogProductBrand(product),
     ...getProductCategories(product),
+    ...getProductCategories(product).map(value => catalogText(value, locale)),
   ];
 
   return normalizeText(
@@ -640,7 +647,8 @@ function getSearchableText(product: Product): string {
 
 export function searchCatalogProducts(
   products: readonly Product[],
-  search: string
+  search: string,
+  locale: SiteLocale = "fr"
 ): Product[] {
   const query = normalizeText(search);
 
@@ -651,7 +659,7 @@ export function searchCatalogProducts(
   const words = query.split(" ").filter(Boolean);
 
   return products.filter((product) => {
-    const searchable = getSearchableText(product);
+    const searchable = getSearchableText(product, locale);
 
     return words.every((word) =>
       searchable.includes(word)
@@ -761,7 +769,7 @@ export function sortCatalogProducts(
     return result.sort(
       (a, b) =>
         multiplier *
-        a.name.localeCompare(b.name, language, {
+        localizedProduct(a, language).name.localeCompare(localizedProduct(b, language).name, language, {
           sensitivity: "base",
           numeric: true,
         })
@@ -798,7 +806,8 @@ export function getFilteredCatalogProducts(
 ): Product[] {
   const searched = searchCatalogProducts(
     products,
-    query.search
+    query.search,
+    locale
   );
 
   const filtered = filterCatalogProducts(

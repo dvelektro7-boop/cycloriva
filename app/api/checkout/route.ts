@@ -607,6 +607,7 @@ export async function POST(
   try {
     pricing =
       await calculateCheckoutPricing({
+        locale: validated.locale,
         country:
           validated.delivery.country,
 

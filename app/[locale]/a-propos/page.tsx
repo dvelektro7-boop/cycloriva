@@ -1,3 +1,4 @@
+import { accessibilityLabel } from "@/lib/accessibility-i18n";
 import "@/components/site/InformationPages.css";
 import { Suspense } from "react";
 
@@ -780,7 +781,7 @@ function AboutBanner({ t }: { t: AboutTexts }) {
 function AboutBreadcrumb({ locale, t }: { locale: Locale; t: AboutTexts }) {
   return (
     <nav
-      aria-label="Breadcrumb"
+      aria-label={accessibilityLabel(locale, "breadcrumb")}
       className="flex items-center gap-2 py-1 text-xs text-[#40576a]"
     >
       <Link

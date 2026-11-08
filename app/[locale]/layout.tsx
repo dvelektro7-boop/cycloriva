@@ -1,10 +1,17 @@
 
 import { Suspense, type ReactNode } from "react";
+import { notFound } from "next/navigation";
+import "../globals.css";
+import { RootDocument } from "@/components/site/RootDocument";
+import { metadata } from "@/lib/site-metadata";
+export { viewport } from "@/lib/site-metadata";
 
 import { SiteChrome } from "@/components/site/SiteChrome";
 
 import {
   siteLocales,
+  isSiteLocale,
+  siteIntlLocales,
   type SiteLocale,
 } from "@/lib/site-i18n";
 
@@ -41,14 +48,34 @@ export function generateStaticParams(): {
 
 type LocaleLayoutProps = {
   children: ReactNode;
+  params: Promise<{ locale: string }>;
 };
+
+const descriptions: Record<SiteLocale, string> = {
+  fr: "Découvrez CYCLORIVA, votre boutique spécialisée dans les vélos électriques, VTT, vélos cargo, vélos de ville et accessoires de mobilité en Europe.",
+  en: "Discover CYCLORIVA, your shop for electric bikes, mountain bikes, cargo bikes, city bikes and mobility accessories in Europe.",
+  de: "Entdecken Sie CYCLORIVA, Ihren Shop für E-Bikes, Mountainbikes, Lastenräder, Citybikes und Mobilitätszubehör in Europa.",
+  es: "Descubre CYCLORIVA, tu tienda de bicicletas eléctricas, de montaña, de carga, urbanas y accesorios de movilidad en Europa.",
+  it: "Scopri CYCLORIVA, il tuo negozio di biciclette elettriche, mountain bike, cargo bike, biciclette da città e accessori per la mobilità in Europa.",
+};
+
+export async function generateMetadata({ params }: Pick<LocaleLayoutProps, "params">) {
+  const { locale } = await params;
+  if (!isSiteLocale(locale)) notFound();
+  const description = descriptions[locale];
+  return { ...metadata, description, openGraph: { ...metadata.openGraph, description, locale: siteIntlLocales[locale].replace("-", "_"), images: [{ url: "/images/imager.png", width: 1536, height: 1024, alt: description }] }, twitter: { ...metadata.twitter, description } };
+}
 
 // LAYOUT PUBLIC
 
-export default function LocaleLayout({
+export default async function LocaleLayout({
   children,
+  params,
 }: LocaleLayoutProps) {
+  const { locale } = await params;
+  if (!isSiteLocale(locale)) notFound();
   return (
+    <RootDocument locale={locale}>
     <Suspense
       fallback={
         <div
@@ -70,5 +97,6 @@ export default function LocaleLayout({
         {children}
       </SiteChrome>
     </Suspense>
+    </RootDocument>
   );
 }

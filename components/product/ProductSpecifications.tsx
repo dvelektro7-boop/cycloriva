@@ -1,5 +1,6 @@
 import { createElement } from "react";
 import { descriptionSpecifications } from "@/lib/product-content";
+import { catalogText } from "@/lib/catalog-translations";
 
 import {
   BatteryCharging,
@@ -840,7 +841,7 @@ export function extractProductSpecifications(
 
     if (key) {
       if (!recognized.has(key)) {
-        recognized.set(key, value);
+        recognized.set(key, catalogText(value, language));
       }
 
       return;
@@ -856,8 +857,8 @@ export function extractProductSpecifications(
     seenAdditional.add(normalizedLabel);
 
     additional.push({
-      label,
-      value,
+      label: catalogText(label, language),
+      value: catalogText(value, language),
     });
   }
 

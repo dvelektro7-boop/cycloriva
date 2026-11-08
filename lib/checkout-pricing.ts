@@ -2,7 +2,8 @@ import { BLACK_FRIDAY } from "@/lib/promotions";
 
 import "server-only";
 
-import { allProducts, currentPrice } from "@/lib/catalog";
+import { allProducts, currentPrice, localizedProduct } from "@/lib/catalog";
+import type { CheckoutLocale } from "@/lib/checkout-i18n";
 
 import type {
   CheckoutCountryCode,
@@ -117,6 +118,7 @@ export type CheckoutPricingCartItem = {
 };
 
 export type CheckoutPricingRequest = {
+  locale?: CheckoutLocale;
   country: CheckoutCountryCode;
   items: readonly CheckoutPricingCartItem[];
 };
@@ -482,10 +484,12 @@ function findCatalogProduct(
 // ============================================================
 
 function getCatalogProductName(
-  product: CatalogProduct
+  product: CatalogProduct,
+  locale: CheckoutLocale
 ): string {
+  const sourceProduct = allProducts.find(item => item.id === String(product.id));
   const name = cleanString(
-    product.name,
+    sourceProduct ? localizedProduct(sourceProduct, locale).name : product.name,
     500
   );
 
@@ -773,7 +777,8 @@ function validateCartItems(
 // ============================================================
 
 function calculateProductLines(
-  cartItems: readonly CheckoutPricingCartItem[]
+  cartItems: readonly CheckoutPricingCartItem[],
+  locale: CheckoutLocale = "fr"
 ): {
   items: CheckoutOrderProduct[];
   subtotalCents: number;
@@ -795,7 +800,7 @@ function calculateProductLines(
     if(product.stockConfirmed===true && typeof product.stockQuantityAtExport==="number" && cartItem.quantity>product.stockQuantityAtExport)fail("PRODUCT_NOT_PURCHASABLE");
 
     const productName =
-      getCatalogProductName(product);
+      getCatalogProductName(product, locale);
 
     const unitPriceCents =
       getCatalogPriceCents(product);
@@ -951,7 +956,7 @@ export async function calculateCheckoutPricing(
   const {
     items,
     subtotalCents,
-  } = calculateProductLines(cartItems);
+  } = calculateProductLines(cartItems, request.locale);
 
   // ---------------------------------------------------------
   // ÉTAPE 3 : CALCULER LA LIVRAISON

@@ -319,7 +319,7 @@ export function SiteFooter({
           <div className="col-span-2 min-w-0 lg:col-span-1">
             <Link
               href={`/${locale}`}
-              aria-label="CYCLORIVA — Accueil"
+            aria-label={`CYCLORIVA — ${siteText(locale, "home")}`}
               className="inline-flex max-w-full items-center rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#75df40]"
             >
               <span

@@ -1,6 +1,7 @@
 import { ProductRelatedRail } from "./ProductRelatedRail";
 import { getProductTranslations, PRODUCT_LOCALES } from "@/lib/product-i18n";
 import { localizedProduct } from "@/lib/catalog";
+import { catalogText } from "@/lib/catalog-translations";
 import { getCatalogCategoryKey } from "@/lib/catalog-filters";
 import { catalogCategoryText } from "@/lib/catalog-i18n";
 
@@ -359,7 +360,7 @@ function getDisplayCategory(
     const key = getCatalogCategoryKey(label);
     if (key) return catalogCategoryText(locale, key);
 
-    if (label) return label;
+    if (label) return catalogText(label, locale);
   }
 
   return null;

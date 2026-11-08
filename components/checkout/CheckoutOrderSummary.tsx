@@ -10,6 +10,7 @@ import {
 
 import Link from "next/link";
 import { productImageUrl } from "@/lib/product-images";
+import { allProducts, localizedProduct } from "@/lib/catalog";
 
 import {
   AlertCircle,
@@ -398,6 +399,8 @@ function SummaryProductRow({
   onRemove: () => void;
 }) {
   const t = getCheckoutTranslations(locale);
+  const sourceProduct = allProducts.find(product => product.id === item.productId);
+  const name = sourceProduct ? localizedProduct(sourceProduct, locale).name : item.name;
 
   /**
    * Ce montant provient du panier local.
@@ -413,20 +416,20 @@ function SummaryProductRow({
     <div className="flex min-w-0 gap-3 border-b border-[#e8edf1] py-4 last:border-b-0">
       <ProductThumbnail
         image={item.image}
-        name={item.name}
+        name={name}
       />
 
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 items-start justify-between gap-2">
           <h3 className="line-clamp-2 min-w-0 text-[12px] leading-4.5 font-extrabold text-[#102b39] sm:text-[13px]">
-            {item.name}
+            {name}
           </h3>
 
           <button
             type="button"
             disabled={disabled}
             onClick={onRemove}
-            aria-label={`${t.cart.removeProduct} : ${item.name}`}
+            aria-label={`${t.cart.removeProduct} : ${name}`}
             title={t.cart.removeProduct}
             className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-[#70808d] transition-colors hover:bg-red-50 hover:text-red-600 focus-visible:outline-2 focus-visible:outline-[#159c27] disabled:cursor-not-allowed disabled:opacity-40"
           >
@@ -446,7 +449,7 @@ function SummaryProductRow({
             disabled={disabled}
             decrementLabel={t.cart.decreaseQuantity}
             incrementLabel={t.cart.increaseQuantity}
-            productName={item.name}
+            productName={name}
             onDecrease={onDecrease}
             onIncrease={onIncrease}
           />

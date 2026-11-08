@@ -1,3 +1,4 @@
+import { accessibilityLabel } from "@/lib/accessibility-i18n";
 
 import "server-only";
 import { Suspense } from "react";
@@ -406,7 +407,7 @@ function ConfirmationBreadcrumb({
 
   return (
     <nav
-      aria-label="Breadcrumb"
+      aria-label={accessibilityLabel(locale, "breadcrumb")}
       className="flex flex-wrap items-center gap-2 py-4 text-xs text-[#526675]"
     >
       <Link
