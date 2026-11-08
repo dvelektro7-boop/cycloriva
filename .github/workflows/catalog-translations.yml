@@ -1,0 +1,54 @@
+name: Generate static catalogue translations
+
+on:
+  push:
+    branches: [codex/offline-catalog-translations]
+
+permissions:
+  contents: read
+
+jobs:
+  translate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install generation tools only
+        run: npm ci --prefix scripts/translation --ignore-scripts --no-audit --no-fund
+      - uses: actions/cache@v4
+        with:
+          path: .translation-cache
+          key: offline-translation-v1-${{ hashFiles('scripts/translation/package-lock.json') }}
+      - name: Download public model weights
+        run: node scripts/translation/download-models.mjs
+      - name: Check translation engine
+        run: node scripts/translation/generate.mjs --sample
+      - name: Generate translations locally in the runner
+        run: node scripts/translation/generate.mjs
+      - name: Check coverage and technical numbers
+        run: node scripts/verify-translations.mjs
+      - name: Export static dictionaries
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: catalogue-translations
+          path: data/catalog-translations.json
+          retention-days: 7
+      - name: Save generation progress
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: translation-progress
+          path: |
+            .translation-cache/en.json
+            .translation-cache/de.json
+            .translation-cache/es.json
+            .translation-cache/it.json
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 7
