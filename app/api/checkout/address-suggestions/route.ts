@@ -1,3 +1,4 @@
+import { isAllowedCheckoutOrigin } from "@/lib/checkout-origin";
 ﻿import { NextRequest, NextResponse } from "next/server";
 import { isCheckoutCountry } from "@/lib/checkout-countries";
 import { parsePhotonSuggestions } from "@/lib/checkout-address-suggestions";
@@ -6,7 +7,7 @@ import { allowCheckoutRequest } from "@/lib/checkout-rate-limit";
 const reply = (body: object, status = 200) =>
   NextResponse.json(body, { status, headers: { "Cache-Control": "no-store" } });
 export async function POST(request: NextRequest) {
-  if (request.headers.get("origin") !== request.nextUrl.origin)
+  if (!isAllowedCheckoutOrigin(request.headers.get("origin"), request.nextUrl.origin))
     return reply({ suggestions: [] }, 403);
   if (request.headers.get("content-type")?.split(";")[0] !== "application/json")
     return reply({ suggestions: [] }, 415);

@@ -1,3 +1,4 @@
+import { isAllowedCheckoutOrigin } from "@/lib/checkout-origin";
 import { allowCheckoutRequest } from "@/lib/checkout-rate-limit";
 
 import "server-only";
@@ -201,8 +202,7 @@ function hasValidOrigin(
       new URL(origin).origin;
 
     return (
-      requestOrigin ===
-      request.nextUrl.origin
+      isAllowedCheckoutOrigin(requestOrigin, request.nextUrl.origin)
     );
   } catch {
     return false;

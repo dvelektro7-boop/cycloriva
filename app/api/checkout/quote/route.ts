@@ -1,3 +1,4 @@
+import { isAllowedCheckoutOrigin } from "@/lib/checkout-origin";
 import { allowCheckoutRequest } from "@/lib/checkout-rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -10,7 +11,7 @@ import {
 } from "@/lib/checkout-validation";
 
 export async function POST(request: NextRequest) {
-  if (request.headers.get("origin") !== request.nextUrl.origin)
+  if (!isAllowedCheckoutOrigin(request.headers.get("origin"), request.nextUrl.origin))
     return NextResponse.json(
       { success: false, code: "FORBIDDEN_ORIGIN" },
       { status: 403 },
