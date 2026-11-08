@@ -31,7 +31,7 @@ test("product, header, cart and checkout share one basket; legacy migration, upd
       JSON.stringify([{ productId: "826", quantity: 2 }]),
     );
     assert.equal(getCartSnapshot().items[0].quantity, 2);
-    assert.equal(getCartSnapshot().items[0].unitPriceCents, 72165);
+    assert.equal(getCartSnapshot().items[0].unitPriceCents, 46907);
     assert.ok(storage.has(CART_STORAGE_KEY));
     let updates = 0;
     const unsubscribe = subscribeToCart(() => updates++);
@@ -43,7 +43,7 @@ test("product, header, cart and checkout share one basket; legacy migration, upd
     const poisoned = JSON.parse(storage.get(CART_STORAGE_KEY)!);
     poisoned.items[0].unitPriceCents = 1;
     storage.set(CART_STORAGE_KEY, JSON.stringify(poisoned));
-    assert.equal(getCartSnapshot().items[0].unitPriceCents, 93415);
+    assert.equal(getCartSnapshot().items[0].unitPriceCents, 60720);
     clearCart();
     assert.equal(getCartSnapshot().items.length, 0);
     assert.equal(getCartSnapshot().items.length, 0);

@@ -1,3 +1,4 @@
+import { promotionPrices } from "@/lib/promotions";
 
 import productsData from "@/data/products.json";
 import { productImageUrl } from "@/lib/product-images";
@@ -251,9 +252,7 @@ function normalizeProduct(raw: Partial<Product>): Product {
 
     name: stringValue(raw.name),
 
-    price: numberOrNull(raw.price),
-    regularPrice: numberOrNull(raw.regularPrice),
-    salePrice: numberOrNull(raw.salePrice),
+    ...promotionPrices(numberOrNull(raw.price), numberOrNull(raw.regularPrice), numberOrNull(raw.salePrice)),
 
     sku: stringValue(raw.sku),
 

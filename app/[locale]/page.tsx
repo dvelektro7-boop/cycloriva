@@ -9,7 +9,7 @@ import { HomeCategories } from "@/components/home/HomeCategories";
 import { HomeProducts } from "@/components/home/HomeProducts";
 import { HomeServices } from "@/components/home/HomeServices";
 import { HomeWhyChoose } from "@/components/home/HomeWhyChoose";
-import { HomeReviews } from "@/components/home/HomeReviews";
+import { HomePromotions } from "@/components/home/HomePromotions";
 import { HomeNewsletter } from "@/components/home/HomeNewsletter";
 
 import {
@@ -143,9 +143,8 @@ export async function generateMetadata({
 
       images: [
         {
-          url: "/images/resaux.png",
-          width: 1200,
-          height: 630,
+          url: "/images/imager.png",
+          width: 1536, height: 1024,
           alt: "CYCLORIVA",
         },
       ],
@@ -155,7 +154,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: `${content.title} | CYCLORIVA`,
       description: content.description,
-      images: ["/images/resaux.png"],
+      images: ["/images/imager.png"],
     },
   };
 }
@@ -250,7 +249,7 @@ async function HomePageContent({
 
           {/* AVIS CLIENTS */}
           <div className="min-w-0">
-            <HomeReviews
+            <HomePromotions
               locale={locale}
               className="py-0 sm:py-0"
             />

@@ -302,9 +302,8 @@ export async function generateMetadata({
       description: productDescription.slice(0, 160),
       images: [
         {
-          url: "/images/resaux.png",
-          width: 1200,
-          height: 630,
+          url: "/images/imager.png",
+          width: 1536, height: 1024,
           alt: "CYCLORIVA",
         },
       ],
@@ -314,7 +313,7 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: productName,
       description: productDescription.slice(0, 160),
-      images: ["/images/resaux.png"],
+      images: ["/images/imager.png"],
     },
   };
 }

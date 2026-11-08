@@ -1661,6 +1661,7 @@ export async function generateMetadata({
     },
 
     openGraph: {
+      images: [{ url: "/images/imager.png", width: 1536, height: 1024, alt: "CYCLORIVA" }],
       type: "website",
       title: `${t.pageTitle} | CYCLORIVA`,
       description: t.metaDescription,

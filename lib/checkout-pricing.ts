@@ -1,3 +1,4 @@
+import { BLACK_FRIDAY } from "@/lib/promotions";
 
 import "server-only";
 
@@ -881,6 +882,8 @@ const SHIPPING_ENV_KEYS: Record<
 function getConfiguredShippingCents(
   country: CheckoutCountryCode
 ): number {
+  if (BLACK_FRIDAY.active && BLACK_FRIDAY.freeShipping) return 0;
+
   const envKey = SHIPPING_ENV_KEYS[country];
 
   const raw = process.env[envKey];
@@ -1215,6 +1218,7 @@ export function getCheckoutShippingConfiguration(): {
         process.env[key];
 
       const configured =
+        (BLACK_FRIDAY.active && BLACK_FRIDAY.freeShipping) ||
         typeof raw === "string" &&
         /^\d+$/.test(raw.trim()) &&
         Number.isSafeInteger(

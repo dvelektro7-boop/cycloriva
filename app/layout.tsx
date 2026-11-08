@@ -12,7 +12,7 @@ const SITE_NAME = "CYCLORIVA";
 
 const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-  "http://localhost:3000";
+  "https://ivory-turkey-921271.hostingersite.com";
 
 const SITE_DESCRIPTION =
   "Découvrez CYCLORIVA, votre boutique spécialisée dans les vélos électriques, VTT, vélos cargo, vélos de ville et accessoires de mobilité en Europe.";
@@ -58,9 +58,8 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: [
       {
-        url: "/images/resaux.png",
-        width: 1200,
-        height: 630,
+        url: "/images/imager.png",
+        width: 1536, height: 1024,
         alt: "CYCLORIVA — Vélos et mobilité en Europe",
       },
     ],
@@ -70,7 +69,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_NAME,
     description: SITE_DESCRIPTION,
-    images: ["/images/resaux.png"],
+    images: ["/images/imager.png"],
   },
 
   // RÉFÉRENCEMENT

@@ -98,10 +98,10 @@ test("real catalogue prices are recalculated in cents, with free delivery for ei
       country,
       items: checkoutFixture.items,
     });
-    assert.equal(pricing.subtotalCents, 237745);
+    assert.equal(pricing.subtotalCents, 154534);
     assert.equal(pricing.shippingCents, 0);
-    assert.equal(pricing.totalCents, 237745);
-    assert.equal(pricing.items[0].unitPriceCents, 72165);
+    assert.equal(pricing.totalCents, 154534);
+    assert.equal(pricing.items[0].unitPriceCents, 46907);
   }
   await assert.rejects(
     calculateCheckoutPricing({
