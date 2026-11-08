@@ -332,7 +332,7 @@ export function SiteHeader({
 
   return (
     <>
-      <header className="relative z-40 w-full border-b border-slate-200 bg-white text-[#102b39] shadow-sm">
+      <header className="sticky top-0 z-40 w-full shrink-0 border-b border-slate-200 bg-white text-[#102b39] shadow-sm">
 
         {/* ===============================================
             VERSION PC : EN-TÊTE PRINCIPAL

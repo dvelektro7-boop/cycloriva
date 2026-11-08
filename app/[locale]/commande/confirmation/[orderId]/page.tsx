@@ -6,13 +6,15 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
+import { io } from "next/cache";
+import { allProducts } from "@/lib/catalog";
+import { ProductImage } from "@/components/product-image";
 import { CONFIRMATION_COOKIE, verifyConfirmationCookie } from "@/lib/checkout-confirmation";
 
 import {
   ArrowLeft,
   ArrowRight,
   BadgeCheck,
-  Bike,
   Check,
   CheckCircle2,
   Clock3,
@@ -458,15 +460,13 @@ function ConfirmationItem({
   currency: string;
 }) {
   const t = pageTexts[locale];
+  const product = allProducts.find((product) => product.id === productId);
+  const missingImage = { fr: "Image indisponible", en: "Image unavailable", de: "Bild nicht verfügbar", es: "Imagen no disponible", it: "Immagine non disponibile" }[locale];
 
   return (
     <div className="flex min-w-0 items-start gap-3 border-b border-slate-100 py-4 last:border-b-0">
       <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 sm:h-20 sm:w-20">
-        <Bike
-          size={30}
-          className="text-[#16a51f]"
-          aria-hidden="true"
-        />
+        <ProductImage src={product?.images[0]} alt={name} missingLabel={missingImage} className="h-full w-full rounded-xl bg-white object-contain p-1" />
       </div>
 
       <div className="min-w-0 flex-1">
@@ -482,7 +482,7 @@ function ConfirmationItem({
           {t.quantity} : {quantity}
         </p>
 
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-1 text-xs font-semibold text-[#128b20]">
           {t.unitPrice} :{" "}
           {formatCheckoutCurrency(
             unitPriceCents,
@@ -492,7 +492,7 @@ function ConfirmationItem({
       </div>
 
       <div className="shrink-0 text-right">
-        <p className="text-sm font-extrabold text-[#102b39] sm:text-base">
+        <p className="text-sm font-extrabold text-[#128b20] sm:text-base">
           {formatCheckoutCurrency(
             lineTotalCents,
             locale
@@ -596,6 +596,8 @@ function ProtectedConfirmation({
 async function CheckoutConfirmationContent({
   params,
 }: ConfirmationPageProps) {
+  // Cookie expiry and order data must only be evaluated at request time.
+  await io();
   const { locale: rawLocale, orderId } =
     await params;
 
@@ -918,7 +920,7 @@ async function CheckoutConfirmationContent({
                       <dt className="text-slate-600">
                         {text.subtotal}
                       </dt>
-                      <dd className="font-semibold">
+                      <dd className="font-semibold text-[#128b20]">
                         {formatCheckoutCurrency(
                           order.subtotalCents,
                           locale
@@ -930,7 +932,7 @@ async function CheckoutConfirmationContent({
                       <dt className="text-slate-600">
                         {text.shipping}
                       </dt>
-                      <dd className="font-semibold">
+                      <dd className="font-semibold text-[#128b20]">
                         {formatCheckoutCurrency(
                           order.shippingCents,
                           locale
@@ -943,7 +945,7 @@ async function CheckoutConfirmationContent({
                         <dt className="text-slate-600">
                           {t.cart.taxes}
                         </dt>
-                        <dd className="font-semibold">
+                        <dd className="font-semibold text-[#128b20]">
                           {formatCheckoutCurrency(
                             order.taxCents,
                             locale
