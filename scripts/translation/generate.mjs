@@ -15,16 +15,24 @@ const outputFile = path.join(root, "data/catalog-translations.json");
 const dictionaries = JSON.parse(await fs.readFile(outputFile, "utf8"));
 const overrides = JSON.parse(await fs.readFile(path.join(root, "data/catalog-translation-overrides.json"), "utf8"));
 const languages = ["en", "de", "es", "it"];
+const requested = process.argv.find(argument => argument.startsWith("--locale="))?.split("=")[1];
+if (requested && !languages.includes(requested)) throw new Error("Unsupported target language");
+const selectedLanguages = requested ? [requested] : languages;
 const segmenter = new Intl.Segmenter("fr", { granularity: "sentence" });
 const numeric = /\d+(?:[.,'’]\d+)*/g;
 const numbers = value => value.match(numeric) ?? [];
+const isTechnicalCode = text => /\d/.test(text) && /^[A-Z][A-Z0-9]*(?:[-/][A-Z0-9]+)*$/.test(text);
+const isMeasurement = text => /\d/.test(text) && /^(?:(?:\d+(?:[.,'’]\d+)*|mm|cm|km|kg|Wh|Ah|Nm|rpm|Hz|m|g|W|V|A|h|s)|[\s×x/°%"'().+\-])+$/i.test(text);
 const genericWords = new Set(["VTT", "VTC", "VAE", "MTB", "BMX", "BIKE", "CITY", "VELO", "VÉLO", "ÉLECTRIQUE", "ELECTRIQUE", "NOIR", "BLANC", "BLEU", "ROUGE", "VERT", "ENFANT", "HOMME", "FEMME"]);
 const protectedTerms = new Set([
-  "CYCLORIVA", "TOTEM", "Shimano", "SHIMANO", "Suntour", "Bafang", "Bosch", "BOSCH", "Phylion", "Schwalbe", "Tektro", "Samsung", "Simplon", "Cube", "Cilo", "EGO Movement", "Riese & Müller", "Brompton", "Giant", "Creme", "Specialized", "Thule", "Naish", "Haibike", "KTM", "Flyer", "Scott", "Kalkhoff", "Winora", "Gazelle", "Babboe", "Carqon", "Urban Arrow", "Tern", "Dahon", "Moustache",
+  "CYCLORIVA", "TOTEM", "Shimano", "SHIMANO", "Suntour", "Bafang", "Bosch", "BOSCH", "Phylion", "Schwalbe", "Tektro", "Samsung", "Simplon", "Cube", "Cilo", "EGO Movement", "Riese & Müller", "Brompton", "Giant", "Creme", "Specialized", "Thule", "Naish", "Haibike", "KTM", "Flyer", "Scott", "Kalkhoff", "Winora", "Gazelle", "Babboe", "Carqon", "Urban Arrow", "Tern", "Dahon", "Moustache", "E-TWOW", "Xiaomi", "Segway", "Ninebot",
+  ...products.flatMap(product => [...(product.description ?? "").matchAll(/^(?:Marque|Marque du moteur|Fabricant|Brand)\s*:\s*([^\n]+)$/gmi)].map(match => match[1].trim())),
   ...products.flatMap(product => product.name.match(/\b[A-Z][A-Z0-9]{1,}(?:-[A-Z0-9]+)*\b/g) ?? []).filter(term => !genericWords.has(term)),
 ]);
 const escapedTerms = [...protectedTerms].sort((a, b) => b.length - a.length).map(term => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-const protectedExpression = new RegExp(`(?<![\\p{L}\\p{N}])(${escapedTerms.join("|")})(?![\\p{L}\\p{N}])`, "gu");
+const protectedLower = new Set([...protectedTerms].map(term => term.toLocaleLowerCase("fr")));
+const isProtected = term => protectedLower.has(term.toLocaleLowerCase("fr"));
+const protectedExpression = new RegExp(`(?<![\\p{L}\\p{N}])(${escapedTerms.join("|")})(?![\\p{L}\\p{N}])`, "giu");
 
 function split(text) {
   const chunks = [];
@@ -34,7 +42,7 @@ function split(text) {
     const fragments = pair ? [pair[1].trim(), ":", pair[2].trim()] : [paragraph];
     for (const part of fragments) {
     for (const fragment of part.split(protectedExpression)) {
-    if (protectedTerms.has(fragment)) { chunks.push(fragment); continue; }
+    if (isProtected(fragment)) { chunks.push(fragment); continue; }
     for (const { segment } of segmenter.segment(fragment)) {
       let remaining = segment.trim();
       while (remaining.length > 400) {
@@ -57,7 +65,7 @@ const caches = {};
 for (const locale of languages) {
   try { caches[locale] = JSON.parse(await fs.readFile(path.join(cache, `${locale}.json`), "utf8")); }
   catch { caches[locale] = {}; }
-  for (const part of parts) if (protectedTerms.has(part) || !/\p{L}{2}/u.test(part)) caches[locale][part] = part;
+  for (const part of parts) if (isProtected(part) || isTechnicalCode(part) || isMeasurement(part) || !/\p{L}{2}/u.test(part)) caches[locale][part] = part;
   for (const part of parts) {
     const reviewed = overrides[locale]?.[part.trim().toLocaleLowerCase("fr")];
     if (reviewed) caches[locale][part] = reviewed;
@@ -87,17 +95,23 @@ async function load(locale) {
 
 if (process.argv.includes("--sample")) {
   const translator = await load("en");
-  console.log(await translator([products[0].name, "Cadre : Aluminium", "Autonomie : environ 80 km"], { max_new_tokens: 100, num_beams: 1 }));
+  const examples = ["Le vélo électrique est équipé de freins à disque.", "La batterie offre une autonomie de 80 km et se recharge en 5 heures."];
+  const results = await translator(examples, { max_new_tokens: 140, num_beams: 4 });
+  for (let i = 0; i < examples.length; i++) {
+    if (!results[i]?.translation_text?.trim() || JSON.stringify(numbers(examples[i])) !== JSON.stringify(numbers(results[i].translation_text))) throw new Error("Local translation engine sample failed");
+  }
+  console.log(results);
   await translator.dispose();
   process.exit(0);
 }
 
 console.log(`[translations] ${texts.length} distinct texts, ${parts.length} reusable segments; all inference runs locally`);
-for (const locale of languages) {
+for (const locale of selectedLanguages) {
   const missing = parts.filter(text => !Object.hasOwn(caches[locale], text));
   if (!missing.length) continue;
   const translator = await load(locale);
   let completed = 0;
+  const issues = [];
   // Group similar lengths to reduce padding during batched CPU inference.
   missing.sort((a, b) => a.length - b.length);
   try {
@@ -107,7 +121,7 @@ for (const locale of languages) {
       const results = await translator(inputs, { max_new_tokens: 220, num_beams: 1 });
       for (let i = 0; i < batch.length; i++) {
         const source = batch[i];
-        let translated = results[i].translation_text.trim();
+        let translated = results[i]?.translation_text?.trim() ?? "";
         const originalNumbers = numbers(source);
         if (originalNumbers.length === numbers(translated).length) {
           let index = 0;
@@ -120,13 +134,14 @@ for (const locale of languages) {
             const fragment = fragments[j];
             if (j % 2 || !/[\p{L}]{2}/u.test(fragment)) { repaired.push(fragment); continue; }
             const input = fragment;
-            const result = await translator(input, { max_new_tokens: 220, num_beams: 1 });
+            const result = await translator(input, { max_new_tokens: 220, num_beams: 4 });
             repaired.push(` ${result[0].translation_text} `);
           }
           translated = repaired.join("").replace(/[ \t]+/g, " ").trim();
         }
         if (!translated || JSON.stringify(numbers(source)) !== JSON.stringify(numbers(translated))) {
-          throw new Error(`Invalid translation or changed numbers (${locale}): ${source}`);
+          issues.push({ source, proposed: translated, reason: "Empty translation or changed technical numbers" });
+          continue;
         }
         caches[locale][source] = translated;
       }
@@ -137,10 +152,12 @@ for (const locale of languages) {
       }
     }
   } finally { await save(locale); await translator.dispose(); }
+  await fs.writeFile(path.join(cache, `review-${locale}.json`), JSON.stringify(issues, null, 2));
+  if (issues.length) throw new Error(`${locale}: ${issues.length} segments require review; see .translation-cache/review-${locale}.json`);
 }
 
-for (const locale of languages) {
-  dictionaries[locale] = Object.fromEntries(texts.map(text => [text, dictionaries[locale]?.[text] || split(text).map(part => part.trim() ? caches[locale][part] : part).join(" ").replace(/ *\n */g, "\n")]));
+for (const locale of selectedLanguages) {
+  dictionaries[locale] = Object.fromEntries(texts.map(text => [text, overrides[locale]?.[text] || overrides[locale]?.[text.trim().toLocaleLowerCase("fr")] || split(text).map(part => part.trim() ? caches[locale][part] : part).join(" ").replace(/ *\n */g, "\n")]));
 }
 const temporary = `${outputFile}.tmp`;
 await fs.writeFile(temporary, JSON.stringify(dictionaries, null, 2) + "\n");
